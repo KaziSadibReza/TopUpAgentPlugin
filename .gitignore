@@ -1,0 +1,10 @@
+# Include everything in the top-up-agent plugin
+*
+!.gitignore
+!wp-content/
+!wp-content/plugins/
+!wp-content/plugins/top-up-agent/
+!wp-content/plugins/top-up-agent/**/*
+
+# Exclude other plugins
+wp-content/plugins/!(top-up-agent)/

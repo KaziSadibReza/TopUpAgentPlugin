@@ -1,0 +1,34 @@
+{
+  "name": "topupagent/top-up-agent",
+  "version": "1.0.0",
+  "autoload": {
+    "psr-4": {
+      "TopUpAgent\\": "includes/",
+      "TopUpAgent\\Abstracts\\": "includes/Abstracts/",
+      "TopUpAgent\\Api\\": "includes/Api/",
+      "TopUpAgent\\Api\\v2\\": "includes/Api/V2/",
+      "TopUpAgent\\Controllers\\": "includes/Controllers/",
+      "TopUpAgent\\Enums\\": "includes/Enums/",
+      "TopUpAgent\\Integrations\\": "includes/Integrations/",
+      "TopUpAgent\\Integrations\\WooCommerce\\": "includes/Integrations/WooCommerce/",
+      "TopUpAgent\\Integrations\\WooCommerce\\Emails\\": "includes/Integrations/WooCommerce/Emails/",
+      "TopUpAgent\\Interfaces\\": "includes/Interfaces/",
+      "TopUpAgent\\Lists\\": "includes/Lists/",
+      "TopUpAgent\\Models\\": "includes/Models/",
+      "TopUpAgent\\Models\\Resources\\": "includes/Models/Resources/",
+      "TopUpAgent\\Repositories\\": "includes/Repositories/",
+      "TopUpAgent\\Repositories\\Resources\\": "includes/Repositories/Resources/",
+      "TopUpAgent\\Settings\\": "includes/Settings/"
+    }
+  },
+  "require": {
+    "defuse/php-encryption": "^2.2",
+    "dompdf/dompdf": "^2.0",
+    "ext-openssl": "*",
+    "ext-json": "*"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "autoloader-suffix": "TopUpAgent"
+  }
+}
