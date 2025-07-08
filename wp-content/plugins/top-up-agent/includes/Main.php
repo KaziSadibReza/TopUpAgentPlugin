@@ -113,7 +113,7 @@ final class Main extends Singleton
 
         $current_screen = get_current_screen();
 
-        if ( $hook === 'product_page_tua_licenses' || $current_screen->id === 'shop_order' || $current_screen->id === 'woocommerce_page_wc-orders' ) {
+        if ( $hook === 'top-up-agent_page_tua_licenses' || $current_screen->id === 'shop_order' || $current_screen->id === 'woocommerce_page_wc-orders' ) {
             // JavaScript
             wp_enqueue_script(
                 'tua_admin_js',
@@ -140,11 +140,11 @@ final class Main extends Singleton
             array(),
             '1.12.1'
         );
-        if ( $hook === 'woocommerce_page_wc-settings' && isset( $_GET['tab'] ) && $_GET['tab'] === 'tua_settings' ) {
+        if ( $hook === 'top-up-agent_page_tua_settings' ) {
             $extra_css = 'p.submit:not(.wrap.tua p.submit){display:none;}';
             wp_add_inline_style('tua_admin_css', $extra_css);
         }
-        if ($hook === 'product_page_tua_licenses' || ( $hook === 'woocommerce_page_wc-settings' && isset( $_GET['tab'] ) && $_GET['tab'] === 'tua_settings' ) ) {
+        if ($hook === 'top-up-agent_page_tua_licenses' || $hook === 'top-up-agent_page_tua_settings') {
             wp_enqueue_script('tua_select2_cdn');
             wp_enqueue_style('tua_select2_cdn');
             wp_enqueue_style('tua_select2');
@@ -152,8 +152,8 @@ final class Main extends Singleton
         }
 
         // Licenses page
-        if ($hook === 'product_page_tua_licenses') {
-            wp_enqueue_script('tua_licenses_page_js', TUA_JS_URL . 'licenses_page.js');
+        if ($hook === 'top-up-agent_page_tua_licenses') {
+            wp_enqueue_script('tua_licenses_page_js', TUA_JS_URL . 'licenses_page.js', array('jquery'));
 
             wp_localize_script(
                 'tua_licenses_page_js',
@@ -175,7 +175,7 @@ final class Main extends Singleton
         }
 
         // Settings page
-        if ( $hook === 'woocommerce_page_wc-settings' && isset( $_GET['tab'] ) && $_GET['tab'] === 'tua_settings' ) {
+        if ( $hook === 'top-up-agent_page_tua_settings' ) {
             wp_enqueue_media();
             wp_enqueue_script('tua_select2_cdn');
             wp_enqueue_style('tua_select2_cdn');

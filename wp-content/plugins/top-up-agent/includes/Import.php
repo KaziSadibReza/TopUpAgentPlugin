@@ -34,7 +34,7 @@ class Import
         $ext                  = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
         $mimes                = array('application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv');
         $fileName             = $_FILES['file']['tmp_name'];
-        $filePath             = tua_ASSETS_DIR . self::TEMP_IMPORT_FILE;
+        $filePath             = TUA_ASSETS_DIR . self::TEMP_IMPORT_FILE;
 
         // Validate the file extension
         if (!in_array($ext, array('txt', 'csv')) || !in_array($_FILES['file']['type'], $mimes)) {
@@ -57,7 +57,7 @@ class Import
 
         // Handle TXT file uploads
         if ($ext == 'txt') {
-            $licenseKeys = file(tua_ASSETS_DIR . self::TEMP_IMPORT_FILE, FILE_IGNORE_NEW_LINES);
+            $licenseKeys = file(TUA_ASSETS_DIR . self::TEMP_IMPORT_FILE, FILE_IGNORE_NEW_LINES);
 
             // Check for invalid file contents.
             if (!is_array($licenseKeys)) {
@@ -77,7 +77,7 @@ class Import
         elseif ($ext == 'csv') {
             $licenseKeys = array();
 
-            if (($handle = fopen(tua_ASSETS_DIR . self::TEMP_IMPORT_FILE, 'r')) !== FALSE) {
+            if (($handle = fopen(TUA_ASSETS_DIR . self::TEMP_IMPORT_FILE, 'r')) !== FALSE) {
                 while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
                     if ($data && is_array($data) && count($data) > 0) {
                         $licenseKeys[] = $data[0];
@@ -117,7 +117,7 @@ class Import
             }
         }
         // Delete the temporary file now that we're done.
-        unlink(tua_ASSETS_DIR . self::TEMP_IMPORT_FILE);
+        unlink(TUA_ASSETS_DIR . self::TEMP_IMPORT_FILE);
 
         return $licenseKeys;
     }
