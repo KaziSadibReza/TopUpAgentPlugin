@@ -22,17 +22,17 @@ msgid ""
 msgstr ""
 
 #. Author URI of the plugin
-msgid "https://www.licensemanager.at/"
+msgid "https://github.com/KaziSadibReza"
 msgstr ""
 
 #. URI of the plugin
-msgid "https://www.wpexperts.io/"
+msgid "https://github.com/KaziSadibReza/TopUpAgentPlugin"
 msgstr ""
 
 #. Name of the plugin
-msgid "License Manager for WooCommerce"
+msgid "Top Up Agent"
 msgstr ""
 
 #. Author of the plugin
-msgid "LicenseManager"
+msgid "Kazi Sadib Reza"
 msgstr ""

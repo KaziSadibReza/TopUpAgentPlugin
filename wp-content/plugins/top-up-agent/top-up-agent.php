@@ -1,13 +1,11 @@
 <?php
 /**
  * Plugin Name: Top Up Agent
- * Plugin URI: https://www.wpexperts.io/
- * Description: Easily sell and manage software license keys through your WooCommerce shop for top-up redemption.
+ * Plugin URI: https://github.com/KaziSadibReza/TopUpAgentPlugin
+ * Description: This plugin automates the Unipin top-up redemption process and woocommerce license management.
  * Version: 1.0.0
- * Author: Top Up Agent
- * Author URI: https://www.wpexperts.io/
- * Requires at least: 4.7
- * Tested up to: 6.8
+ * Author: Kazi Sadib Reza
+ * Author URI: https://github.com/KaziSadibReza
  * Requires PHP: 7.0
  * WC requires at least: 5.0
  * WC tested up to: 9.6

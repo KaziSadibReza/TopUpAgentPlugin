@@ -206,18 +206,8 @@ final class Main extends Singleton
             $newLinks = array(
                 'github' => sprintf(
                     '<a href="%s" target="_blank">%s</a>',
-                    'https://github.com/wpexperts/top-up-agent',
+                    'https://github.com/KaziSadibReza/TopUpAgentPlugin',
                     'GitHub'
-                ),
-                'docs' => sprintf(
-                    '<a href="%s" target="_blank">%s</a>',
-                    'https://www.wpexperts.io/docs/',
-                    __('Documentation', 'top-up-agent')
-                ),
-                'support' => sprintf(
-                    '<a href="%s" target="_blank">%s</a>',
-                    'https://www.wpexperts.io/support/',
-                    __('Support', 'top-up-agent')
                 )
             );
 
