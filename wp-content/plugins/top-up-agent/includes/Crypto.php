@@ -62,7 +62,8 @@ class Crypto
         add_filter('tua_encrypt', array($this, 'encrypt'), 10, 1);
         add_filter('tua_decrypt', array($this, 'decrypt'), 10, 1);
         add_filter('tua_hash',    array($this, 'hash'),    10, 1);
-        add_filter('tua_activation_hash',    array($this, 'activationHash'),    10, 1);
+        add_filter('tua_activation_hash', array($this, 'activationHash'), 10, 1);
+        add_filter('tua_rand_hash', array($this, 'generateRandomHash'), 10, 1);
 
     }
 
@@ -73,7 +74,7 @@ class Crypto
     {
         /* When the cryptographic secrets are loaded into these constants, no other files are needed */
         if (defined('TUA_PLUGIN_DEFUSE')) {
-            $this->keyAscii = TUA_PLUGIN_DEFUSE;
+            $this->keyAscii = constant('TUA_PLUGIN_DEFUSE');
             error_log('TopUpAgent: Using defuse key from TUA_PLUGIN_DEFUSE constant');
             return;
         }
@@ -94,7 +95,7 @@ class Crypto
     {
         /* When the cryptographic secrets are loaded into these constants, no other files are needed */
         if (defined('TUA_PLUGIN_SECRET')) {
-            $this->keySecret = TUA_PLUGIN_SECRET;
+            $this->keySecret = constant('TUA_PLUGIN_SECRET');
             error_log('TopUpAgent: Using secret key from TUA_PLUGIN_SECRET constant');
             return;
         }
@@ -193,8 +194,30 @@ class Crypto
         return hash_hmac('sha256', $value, $this->keySecret);
     }
 
-    public function activationHash( $license_key ) {
-        return sha1( sprintf( '%s%s%s%s', $license_key, tua_rand_hash(), mt_rand( 10000, 1000000 ), tua_clientIp() ) );
+    /**
+     * Generates an activation hash for the given license key.
+     *
+     * @param string $licenseKey
+     *
+     * @return string
+     */
+    public function activationHash($licenseKey)
+    {
+        return $this->hash($licenseKey . $this->generateRandomHash());
+    }
+
+    /**
+     * Generates a random hash.
+     *
+     * @return string
+     */
+    public function generateRandomHash()
+    {
+        if (!function_exists('openssl_random_pseudo_bytes')) {
+            return sha1(wp_rand());
+        }
+
+        return bin2hex(openssl_random_pseudo_bytes(20));
     }
 
 }
