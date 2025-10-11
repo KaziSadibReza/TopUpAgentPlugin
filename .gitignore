@@ -1,10 +1,8 @@
-# Include everything in the top-up-agent plugin
+# Ignore everything in this directory
 *
-!.gitignore
+.htaccess
+# But don't ignore the top-up-agent plugin directory
 !wp-content/
 !wp-content/plugins/
 !wp-content/plugins/top-up-agent/
-!wp-content/plugins/top-up-agent/**/*
-
-# Exclude other plugins
-wp-content/plugins/!(top-up-agent)/
+!wp-content/plugins/top-up-agent/**
