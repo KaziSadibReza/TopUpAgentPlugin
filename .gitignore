@@ -1,6 +1,8 @@
 # Ignore everything in this directory
 *
-.htaccess
+!.github
+!.github/**
+!.gitignore
 # But don't ignore the top-up-agent plugin directory
 !wp-content/
 !wp-content/plugins/
