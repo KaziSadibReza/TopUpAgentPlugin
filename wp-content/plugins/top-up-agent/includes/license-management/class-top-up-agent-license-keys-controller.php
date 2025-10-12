@@ -60,15 +60,38 @@ class Top_Up_Agent_License_Keys_Controller {
     <?php $this->ui_renderer->render_edit_group_form($edit_group_id); ?>
     <?php endif; ?>
 
-    <!-- Add New License Key -->
+    <!-- Section Toggle Controls -->
     <?php if (!$edit_key && !$edit_group_id): ?>
-    <?php $this->ui_renderer->render_add_form(); ?>
+    <div class="section-toggles">
+        <h3>📋 Manage Sections</h3>
+        <button type="button" class="toggle-btn" data-target="add-license-section">
+            <span class="text">Add New License Key</span>
+            <span class="section-status hidden">Hidden</span>
+        </button>
+        <button type="button" class="toggle-btn" data-target="bulk-import-section">
+            <span class="text">Bulk Import License Keys</span>
+            <span class="section-status hidden">Hidden</span>
+        </button>
+        <button type="button" class="toggle-btn" data-target="automation-section">
+            <span class="text">Automation Settings</span>
+            <span class="section-status hidden">Hidden</span>
+        </button>
+    </div>
+
+    <!-- Add New License Key -->
+    <div id="add-license-section" class="collapsible-section hidden">
+        <?php $this->ui_renderer->render_add_form(); ?>
+    </div>
 
     <!-- Automation Settings -->
-    <?php $this->automation_manager->render_automation_settings_form(); ?>
+    <div id="automation-section" class="collapsible-section hidden">
+        <?php $this->automation_manager->render_automation_settings_form(); ?>
+    </div>
 
     <!-- Bulk Import -->
-    <?php $this->ui_renderer->render_bulk_import_form(); ?>
+    <div id="bulk-import-section" class="collapsible-section hidden">
+        <?php $this->ui_renderer->render_bulk_import_form(); ?>
+    </div>
     <?php endif; ?>
 
     <!-- License Keys List -->

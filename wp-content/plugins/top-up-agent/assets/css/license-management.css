@@ -1,6 +1,386 @@
 /* Top Up Agent - License Management Styles */
 /* Modern License Management Interface with Mobile Responsive Design */
 
+/* ===== CSS CUSTOM PROPERTIES (CSS VARIABLES) ===== */
+/* Centralized color system for easy theme management */
+:root {
+  /* === PRIMARY COLORS === */
+  --primary-blue: #3b82f6;
+  --primary-blue-dark: #2563eb;
+  --primary-blue-darker: #1d4ed8;
+  --primary-blue-darkest: #1e40af;
+
+  /* === SECONDARY COLORS === */
+  --green: #10b981;
+  --green-dark: #059669;
+  --green-darker: #047857;
+  --green-light: #d1fae5;
+  --green-text: #065f46;
+
+  --red: #ef4444;
+  --red-dark: #dc2626;
+  --red-darker: #991b1b;
+  --red-bright: #ff0000;
+  --red-light: #fee2e2;
+
+  --orange: #f59e0b;
+  --orange-dark: #d97706;
+
+  --purple: #8b5cf6;
+  --purple-dark: #7c3aed;
+  --purple-light: #ede9fe;
+
+  /* === NEUTRAL COLORS === */
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #374151;
+  --gray-700: #1f2937;
+
+  /* === BACKGROUND COLORS === */
+  --bg-primary: var(--white);
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-muted: var(--gray-100);
+  --bg-hover: var(--gray-50);
+  --bg-blue-light: #f0f9ff;
+  --bg-slate-200: #cbd5e1;
+  --bg-slate-400: #94a3b8;
+
+  /* === TEXT COLORS === */
+  --text-primary: var(--gray-700);
+  --text-secondary: var(--gray-600);
+  --text-muted: var(--gray-500);
+  --text-light: var(--gray-400);
+  --text-white: var(--white);
+
+  /* === BORDER COLORS === */
+  --border-primary: var(--gray-200);
+  --border-secondary: var(--gray-300);
+  --border-focus: var(--primary-blue);
+  --border-hover: var(--primary-blue);
+
+  /* === SHADOW COLORS === */
+  --shadow-sm: rgba(0, 0, 0, 0.1);
+  --shadow-md: rgba(0, 0, 0, 0.15);
+  --shadow-blue: rgba(59, 130, 246, 0.2);
+  --shadow-blue-md: rgba(59, 130, 246, 0.3);
+  --shadow-blue-lg: rgba(59, 130, 246, 0.4);
+
+  /* === GRADIENTS === */
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--primary-blue),
+    var(--primary-blue-dark)
+  );
+  --gradient-primary-hover: linear-gradient(
+    135deg,
+    var(--primary-blue-dark),
+    var(--primary-blue-darker)
+  );
+  --gradient-primary-alt: linear-gradient(
+    135deg,
+    var(--primary-blue),
+    var(--primary-blue-darker)
+  );
+  --gradient-primary-alt-hover: linear-gradient(
+    135deg,
+    var(--primary-blue-dark),
+    var(--primary-blue-darkest)
+  );
+  --gradient-green: linear-gradient(135deg, var(--green), var(--green-dark));
+  --gradient-green-hover: linear-gradient(
+    135deg,
+    var(--green-dark),
+    var(--green-darker)
+  );
+
+  /* === SPACING (if needed for future consistency) === */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+
+  /* === BORDER RADIUS === */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* === TRANSITIONS === */
+  --transition-fast: all 0.2s ease;
+  --transition-medium: all 0.3s ease;
+}
+
+/*
+=== CSS VARIABLES USAGE GUIDE ===
+
+To change the theme colors, simply modify the variables in the :root section above.
+
+Examples:
+- Primary theme: Change --primary-blue, --primary-blue-dark, etc.
+- Success theme: Change --green, --green-dark, etc.
+- Error theme: Change --red, --red-dark, etc.
+- Backgrounds: Change --bg-primary, --bg-secondary, etc.
+- Text colors: Change --text-primary, --text-secondary, etc.
+
+Common patterns:
+- var(--primary-blue) for main blue color
+- var(--gradient-primary) for blue gradients
+- var(--text-primary) for main text
+- var(--border-primary) for borders
+- var(--shadow-blue) for blue shadows
+- var(--radius-md) for border radius
+- var(--transition-fast) for animations
+
+This system ensures consistent theming across the entire interface.
+*/
+
+/* ===== COLLAPSIBLE SECTIONS SYSTEM ===== */
+/* Toggle buttons and collapsible sections for better page organization */
+
+/* Toggle Buttons Container */
+.section-toggles {
+  display: flex;
+  gap: var(--space-md);
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+  flex-wrap: wrap;
+}
+
+.section-toggles h3 {
+  width: 100%;
+  margin: 0 0 var(--space-md) 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Toggle Button Styling */
+.toggle-btn {
+  padding: var(--space-md) var(--space-xl);
+  background: var(--gradient-primary);
+  color: var(--text-white);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: var(--transition-fast);
+  box-shadow: 0 2px 4px var(--shadow-blue-md);
+  position: relative;
+  min-width: 180px;
+  justify-content: center;
+}
+
+.toggle-btn:hover {
+  background: var(--gradient-primary-hover);
+  color: var(--text-white);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-blue-lg);
+}
+
+.toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--shadow-blue), 0 4px 8px var(--shadow-blue-lg);
+}
+
+.toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px var(--shadow-blue-md);
+}
+
+/* Active state for toggle buttons */
+.toggle-btn.active {
+  background: var(--gradient-green);
+  box-shadow: 0 2px 4px var(--shadow-md);
+}
+
+.toggle-btn.active:hover {
+  background: var(--gradient-green-hover);
+  box-shadow: 0 4px 8px var(--shadow-md);
+}
+
+.toggle-btn .text {
+  font-weight: 600;
+}
+
+/* Section state indicators with SVG arrows */
+.toggle-btn::after {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin-left: var(--space-xs);
+  transition: var(--transition-fast);
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 14.5C11.9015 14.5005 11.8038 14.4813 11.7128 14.4435C11.6218 14.4057 11.5392 14.3501 11.47 14.28L8 10.78C7.90861 10.6391 7.86719 10.4715 7.88238 10.3042C7.89756 10.1369 7.96848 9.97954 8.08376 9.85735C8.19904 9.73515 8.352 9.65519 8.51814 9.63029C8.68428 9.6054 8.85396 9.63699 9 9.72003L12 12.72L15 9.72003C15.146 9.63699 15.3157 9.6054 15.4819 9.63029C15.648 9.65519 15.801 9.73515 15.9162 9.85735C16.0315 9.97954 16.1024 10.1369 16.1176 10.3042C16.1328 10.4715 16.0914 10.6391 16 10.78L12.5 14.28C12.3675 14.4144 12.1886 14.4931 12 14.5Z' fill='white'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: rotate(0deg);
+}
+
+.toggle-btn.active::after {
+  transform: rotate(180deg);
+}
+
+/* Smooth hover effect for arrows */
+.toggle-btn:hover::after {
+  transform: scale(1.1) rotate(0deg);
+}
+
+.toggle-btn.active:hover::after {
+  transform: scale(1.1) rotate(180deg);
+}
+
+/* Collapsible Sections */
+.collapsible-section {
+  margin: var(--space-xl) 0;
+  opacity: 1;
+  max-height: none;
+  overflow: visible;
+  transition: all 0.3s ease;
+}
+
+.collapsible-section.hidden {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  transform: translateY(-10px);
+}
+
+/* Smooth reveal animation */
+.collapsible-section.revealing {
+  animation: slideDown 0.3s ease forwards;
+}
+
+.collapsible-section.hiding {
+  animation: slideUp 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Enhanced form container styling for collapsible sections */
+.collapsible-section .license-form-container,
+.collapsible-section .card {
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  box-shadow: 0 4px 12px var(--shadow-sm);
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.collapsible-section .license-form-container:hover,
+.collapsible-section .card:hover {
+  border-color: var(--border-focus);
+  box-shadow: 0 6px 16px var(--shadow-md);
+}
+
+/* Add a subtle indicator for collapsible sections */
+.collapsible-section .license-form-container::before,
+.collapsible-section .card::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  height: 4px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  opacity: 0.8;
+}
+
+/* Section headers within collapsible areas */
+.collapsible-section h2 {
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-primary);
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+/* Status indicators */
+.section-status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px var(--space-sm);
+  border-radius: 4px;
+  margin-left: var(--space-sm);
+}
+
+.section-status.visible {
+  background: var(--green-light);
+  color: var(--green-text);
+}
+
+.section-status.hidden {
+  background: var(--gray-200);
+  color: var(--text-muted);
+}
+
+/* Responsive design for toggle buttons */
+@media (max-width: 768px) {
+  .section-toggles {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .toggle-btn {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .collapsible-section {
+    margin: var(--space-lg) 0;
+  }
+}
+
+/* Focus management for accessibility */
+.toggle-btn:focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
 /* Page-specific overflow control for license management page */
 .toplevel_page_top-up-agent-dashboard,
 .top-up-agent_page_top-up-agent-license-keys {
@@ -48,23 +428,23 @@
 
 /* Stat Card Color Variants */
 .stat-total {
-  border-left-color: #3b82f6;
+  border-left-color: var(--primary-blue);
 }
 
 .stat-available {
-  border-left-color: #10b981;
+  border-left-color: var(--green);
 }
 
 .stat-used {
-  border-left-color: #ef4444;
+  border-left-color: var(--red);
 }
 
 .stat-group {
-  border-left-color: #8b5cf6;
+  border-left-color: var(--purple);
 }
 
 .stat-recent {
-  border-left-color: #f59e0b;
+  border-left-color: var(--orange);
 }
 
 .stat-icon {
@@ -81,7 +461,7 @@
 
 .stat-label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -190,7 +570,7 @@ label[for="is_group_product"]:hover {
 .search-filter-panel h3 {
   margin: 0 0 20px 0;
   font-size: 18px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .export-panel,
@@ -309,27 +689,27 @@ label[for="is_group_product"]:hover {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--text-white);
   border: 2px solid transparent;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
+  background: var(--gradient-primary-hover);
+  color: var(--text-white);
   text-decoration: none;
 }
 
 .btn-secondary {
-  background: #f8fafc;
-  color: #374151;
-  border: 2px solid #e5e7eb;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 2px solid var(--border-primary);
 }
 
 .btn-secondary:hover {
-  background: #f1f5f9;
-  border-color: #d1d5db;
-  color: #1f2937;
+  background: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
   text-decoration: none;
 }
 
@@ -341,22 +721,22 @@ label[for="is_group_product"]:hover {
 }
 
 .filter-actions .btn-primary {
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-color: #10b981;
+  background: var(--gradient-green);
+  border-color: var(--green);
 }
 
 .filter-actions .btn-primary:hover {
-  background: linear-gradient(135deg, #059669, #047857);
+  background: var(--gradient-green-hover);
 }
 
 .btn-export {
-  background: #10b981;
-  color: white;
+  background: var(--green);
+  color: var(--text-white);
   margin-right: 10px;
 }
 
 .btn-export:hover {
-  background: #059669;
+  background: var(--green-dark);
 }
 
 /* Active Filters */
@@ -526,32 +906,32 @@ label[for="is_group_product"]:hover {
 }
 
 .btn-edit {
-  background: #f59e0b;
-  color: white;
+  background: var(--orange);
+  color: var(--text-white);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   font-size: 12px;
 }
 
 .btn-edit:hover {
-  background: #d97706;
-  color: white;
+  background: var(--orange-dark);
+  color: var(--text-white);
   text-decoration: none;
 }
 
 .btn-delete {
-  background: #ef4444;
-  color: white;
+  background: var(--red);
+  color: var(--text-white);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
   font-size: 12px;
 }
 
 .btn-delete:hover {
-  background: #dc2626;
+  background: var(--red-dark);
 }
 
 /* Pagination */
@@ -1276,20 +1656,20 @@ label[for="is_group_product"]:hover {
 .form-select {
   width: 100%;
   padding: 10px 12px;
-  background: #f8fafc !important;
-  border: 2px solid #e5e7eb !important;
-  border-radius: 8px !important;
+  background: var(--bg-secondary) !important;
+  border: 2px solid var(--border-primary) !important;
+  border-radius: var(--radius-md) !important;
   font-size: 14px;
-  transition: border-color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .form-textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
   font-size: 14px;
-  transition: border-color 0.2s;
+  transition: var(--transition-fast);
   font-family: "Courier New", monospace;
   line-height: 1.5;
   resize: vertical;
@@ -1299,14 +1679,14 @@ label[for="is_group_product"]:hover {
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px var(--shadow-blue) !important;
 }
 
 .form-help {
   margin: 6px 0 0 0;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* Modern Option Selector */
@@ -1502,10 +1882,10 @@ label[for="is_group_product"]:hover {
 
 .card .button-primary,
 .card input[type="submit"] {
-  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-  color: white !important;
+  background: var(--gradient-primary) !important;
+  color: var(--text-white) !important;
   border: 2px solid transparent !important;
-  border-radius: 8px !important;
+  border-radius: var(--radius-md) !important;
   padding: 10px 28px !important;
   font-weight: 600 !important;
   font-size: 14px !important;
@@ -1513,32 +1893,31 @@ label[for="is_group_product"]:hover {
   text-decoration: none !important;
   display: inline-block !important;
   text-align: center !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+  transition: var(--transition-fast) !important;
+  box-shadow: 0 2px 4px var(--shadow-blue-md) !important;
   text-shadow: none !important;
   min-width: 160px;
 }
 
 .card .button-primary:hover,
 .card input[type="submit"]:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-  color: white !important;
+  background: var(--gradient-primary-hover) !important;
+  color: var(--text-white) !important;
   text-decoration: none !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 4px 8px var(--shadow-blue-lg) !important;
 }
 
 .card .button-primary:focus,
 .card input[type="submit"]:focus {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2),
-    0 4px 8px rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 0 0 3px var(--shadow-blue), 0 4px 8px var(--shadow-blue-lg) !important;
 }
 
 .card .button-primary:active,
 .card input[type="submit"]:active {
   transform: translateY(0) !important;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 2px 4px var(--shadow-blue-md) !important;
 }
 
 /* Responsive Design for Automation Settings */

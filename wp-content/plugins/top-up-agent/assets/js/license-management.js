@@ -20,6 +20,7 @@
     initializeCopyToClipboard();
     initializePreviewUpdaters();
     initializeFormValidation();
+    initializeSectionToggles();
   }
 
   /**
@@ -397,6 +398,109 @@
   window.confirmDeleteLicenseKey = function () {
     return confirm(topUpAgentLicense.strings.confirmDelete);
   };
+
+  /**
+   * Initialize section toggle functionality
+   * Handles show/hide for Add New License Key, Bulk Import, and Automation Settings
+   */
+  function initializeSectionToggles() {
+    // Check localStorage for saved section states
+    const savedStates = JSON.parse(
+      localStorage.getItem("licensePageSections") || "{}"
+    );
+
+    // Initialize sections as hidden by default, unless saved state says otherwise
+    const sections = [
+      "add-license-section",
+      "bulk-import-section",
+      "automation-section",
+    ];
+
+    sections.forEach((sectionId) => {
+      const section = $("#" + sectionId);
+      const isVisible = savedStates[sectionId] === true;
+
+      if (section.length) {
+        if (isVisible) {
+          section.removeClass("hidden").addClass("revealing");
+          updateToggleButton(sectionId, true);
+        } else {
+          section.addClass("hidden");
+          updateToggleButton(sectionId, false);
+        }
+      }
+    });
+
+    // Handle toggle button clicks
+    $(".toggle-btn").on("click", function (e) {
+      e.preventDefault();
+
+      const targetSection = $(this).data("target");
+      const section = $("#" + targetSection);
+
+      if (section.length) {
+        const isCurrentlyVisible = !section.hasClass("hidden");
+
+        if (isCurrentlyVisible) {
+          // Hide section
+          section.removeClass("revealing").addClass("hiding");
+          setTimeout(() => {
+            section.removeClass("hiding").addClass("hidden");
+          }, 300);
+          updateToggleButton(targetSection, false);
+        } else {
+          // Show section
+          section.removeClass("hidden hiding").addClass("revealing");
+          setTimeout(() => {
+            section.removeClass("revealing");
+          }, 300);
+          updateToggleButton(targetSection, true);
+        }
+
+        // Save state to localStorage
+        saveSectionState(targetSection, !isCurrentlyVisible);
+
+        // Scroll to section if showing
+        if (!isCurrentlyVisible) {
+          setTimeout(() => {
+            $("html, body").animate(
+              {
+                scrollTop: section.offset().top - 20,
+              },
+              500
+            );
+          }, 150);
+        }
+      }
+    });
+  }
+
+  /**
+   * Update toggle button appearance and text
+   */
+  function updateToggleButton(sectionId, isVisible) {
+    const button = $(`.toggle-btn[data-target="${sectionId}"]`);
+    const statusSpan = button.find(".section-status");
+
+    if (isVisible) {
+      button.addClass("active");
+      statusSpan.removeClass("hidden").addClass("visible").text("Visible");
+    } else {
+      button.removeClass("active");
+      statusSpan.removeClass("visible").addClass("hidden").text("Hidden");
+    }
+  }
+
+  /**
+   * Save section visibility state to localStorage
+   */
+  function saveSectionState(sectionId, isVisible) {
+    const savedStates = JSON.parse(
+      localStorage.getItem("licensePageSections") || "{}"
+    );
+    savedStates[sectionId] = isVisible;
+    localStorage.setItem("licensePageSections", JSON.stringify(savedStates));
+  }
 
   window.confirmDeleteGroup = function () {
     return confirm(topUpAgentLicense.strings.confirmDeleteGroup);
