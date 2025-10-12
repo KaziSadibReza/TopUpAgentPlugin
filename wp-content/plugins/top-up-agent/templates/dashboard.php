@@ -846,11 +846,11 @@ function performSiteSpecificCleanup(siteUrl) {
                 addLogMessage(`🔒 Only THIS site's data was affected`, 'success');
 
                 if (deletedCount > 0) {
-                    addLogMessage('� Refreshing dashboard in 3 seconds...', 'info');
-                    // Refresh the page to show updated stats
-                    setTimeout(() => {
-                        location.reload();
-                    }, 3000);
+                    addLogMessage('✅ Cleanup completed successfully', 'info');
+                    // Auto-reload after cleanup - DISABLED
+                    // setTimeout(() => {
+                    //     location.reload();
+                    // }, 3000);
                 } else {
                     addLogMessage('ℹ️ No records were found to delete', 'info');
                     updateLogStatus();
@@ -920,14 +920,14 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeSocketConnection();
     }, 1000);
 
-    // Auto-refresh queue data every 30 seconds
-    setInterval(() => {
-        // Only refresh if we're viewing running or pending tabs
-        const activeTab = document.querySelector('.nav-tab-active').textContent;
-        if (activeTab.includes('Running') || activeTab.includes('Pending')) {
-            location.reload();
-        }
-    }, 30000);
+    // Auto-refresh queue data every 30 seconds - DISABLED
+    // setInterval(() => {
+    //     // Only refresh if we're viewing running or pending tabs
+    //     const activeTab = document.querySelector('.nav-tab-active').textContent;
+    //     if (activeTab.includes('Running') || activeTab.includes('Pending')) {
+    //         location.reload();
+    //     }
+    // }, 30000);
 });
 
 // Socket.IO real-time connection
@@ -1068,8 +1068,8 @@ function fetchInitialStatus() {
 
 // Fallback polling function (only used if Socket.IO fails)
 function startPollingFallback() {
-    addLogMessage('🔄 Using polling fallback (5-second intervals)', 'warn');
-    setInterval(fetchInitialStatus, 5000);
+    addLogMessage('🔄 Polling fallback disabled - manual refresh required', 'warn');
+    // setInterval(fetchInitialStatus, 5000); // DISABLED - auto-polling turned off
 }
 
 function updateLogStatus() {

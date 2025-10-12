@@ -45,44 +45,37 @@ class Top_Up_Agent_License_Keys_Controller {
         
         // Render the page
         ?>
-        <div class="wrap">
-            <h1>License Key Management</h1>
-            
-            <?php echo $message; ?>
-            
-            <?php $this->ui_renderer->render_assets(); ?>
+<div class="wrap">
+    <h1>License Key Management</h1>
 
-            <!-- Edit License Key Form -->
-            <?php if ($edit_key): ?>
-                <?php $this->ui_renderer->render_edit_form($edit_key); ?>
-            <?php endif; ?>
-            
-            <!-- Edit Group License Keys Form -->
-            <?php if ($edit_group_id): ?>
-                <?php $this->ui_renderer->render_edit_group_form($edit_group_id); ?>
-            <?php endif; ?>
+    <?php echo $message; ?>
 
-            <!-- Add New License Key -->
-            <?php if (!$edit_key && !$edit_group_id): ?>
-                <?php $this->ui_renderer->render_add_form(); ?>
-                
-                <!-- Automation Settings -->
-                <?php $this->automation_manager->render_automation_settings_form(); ?>
+    <!-- Edit License Key Form -->
+    <?php if ($edit_key): ?>
+    <?php $this->ui_renderer->render_edit_form($edit_key); ?>
+    <?php endif; ?>
 
-                <!-- Test Automation -->
-                <?php $this->automation_manager->render_test_automation_form(); ?>
+    <!-- Edit Group License Keys Form -->
+    <?php if ($edit_group_id): ?>
+    <?php $this->ui_renderer->render_edit_group_form($edit_group_id); ?>
+    <?php endif; ?>
 
-                <!-- Bulk Import -->
-                <?php $this->ui_renderer->render_bulk_import_form(); ?>
-            <?php endif; ?>
+    <!-- Add New License Key -->
+    <?php if (!$edit_key && !$edit_group_id): ?>
+    <?php $this->ui_renderer->render_add_form(); ?>
 
-            <!-- License Keys List -->
-            <?php $this->ui_renderer->render_license_keys_table(); ?>
-        </div>
+    <!-- Automation Settings -->
+    <?php $this->automation_manager->render_automation_settings_form(); ?>
 
-        <?php $this->ui_renderer->render_styles(); ?>
-        <?php $this->ui_renderer->render_scripts(); ?>
-        <?php
+    <!-- Bulk Import -->
+    <?php $this->ui_renderer->render_bulk_import_form(); ?>
+    <?php endif; ?>
+
+    <!-- License Keys List -->
+    <?php $this->ui_renderer->render_license_keys_table(); ?>
+</div>
+
+<?php
     }
     
     // Getter methods for external access if needed

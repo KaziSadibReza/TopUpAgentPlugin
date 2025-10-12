@@ -3,6 +3,11 @@ class Top_Up_Agent_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'register_menus'));
         
+        // Hide other plugin notifications on our plugin pages - multiple hooks for better coverage
+        add_action('admin_init', array($this, 'hide_other_plugin_notifications'));
+        add_action('current_screen', array($this, 'hide_other_plugin_notifications_late'));
+        add_action('admin_head', array($this, 'hide_admin_notices_css'));
+        
         // Add AJAX handler for failure notifications
         add_action('wp_ajax_send_failure_notification', array($this, 'handle_failure_notification'));
         add_action('wp_ajax_nopriv_send_failure_notification', array($this, 'handle_failure_notification'));
@@ -315,6 +320,287 @@ This email was sent automatically by TopUp Agent.
     
     public function settings_page() {
         include plugin_dir_path(__FILE__) . '../../templates/settings.php';
+    }
+    
+    /**
+     * Hide other plugin notifications when viewing Top Up Agent pages
+     */
+    public function hide_other_plugin_notifications() {
+        // Check if we're on any of our plugin pages
+        if (!$this->is_our_admin_page()) {
+            return;
+        }
+
+        // Remove all admin notices with high priority to run late
+        add_action('admin_notices', array($this, 'remove_all_admin_notices'), 1);
+        add_action('all_admin_notices', array($this, 'remove_all_admin_notices'), 1);
+        add_action('network_admin_notices', array($this, 'remove_all_admin_notices'), 1);
+        add_action('user_admin_notices', array($this, 'remove_all_admin_notices'), 1);
+    }
+
+    /**
+     * Late hook to hide notifications - runs after current_screen is set
+     */
+    public function hide_other_plugin_notifications_late() {
+        if (!$this->is_our_admin_page()) {
+            return;
+        }
+
+        // Remove admin notice hooks more aggressively
+        $this->remove_notice_hooks();
+        
+        // Add JavaScript to hide any remaining notices
+        add_action('admin_footer', array($this, 'hide_notices_javascript'));
+    }
+
+    /**
+     * Check if we're on one of our admin pages
+     */
+    private function is_our_admin_page() {
+        if (!function_exists('get_current_screen')) {
+            return false;
+        }
+        
+        $screen = get_current_screen();
+        if (!$screen) {
+            return false;
+        }
+
+        $our_pages = array(
+            'toplevel_page_top-up-agent-dashboard',
+            'top-up-agent_page_top-up-agent-woocommerce',
+            'top-up-agent_page_top-up-agent-license-keys',
+            'top-up-agent_page_top-up-agent-settings'
+        );
+
+        return in_array($screen->id, $our_pages);
+    }
+
+    /**
+     * Remove all admin notices that aren't ours
+     */
+    public function remove_all_admin_notices() {
+        // Don't execute this on subsequent calls
+        static $notices_removed = false;
+        if ($notices_removed) {
+            return;
+        }
+        $notices_removed = true;
+
+        // Capture and clear all output
+        if (ob_get_level()) {
+            ob_clean();
+        }
+        
+        // Start output buffering to capture notices
+        ob_start(array($this, 'filter_admin_notices'));
+    }
+
+    /**
+     * Filter admin notices to only show our own
+     */
+    public function filter_admin_notices($output) {
+        // If the notice contains our plugin identifier, keep it
+        if (strpos($output, 'top-up-agent-notice') !== false || 
+            strpos($output, 'Top Up Agent') !== false) {
+            return $output;
+        }
+        
+        // Otherwise, return empty to hide it
+        return '';
+    }
+
+    /**
+     * Remove notice hooks from other plugins
+     */
+    private function remove_notice_hooks() {
+        global $wp_filter;
+        
+        $notice_hooks = array('admin_notices', 'all_admin_notices', 'network_admin_notices', 'user_admin_notices');
+        
+        foreach ($notice_hooks as $hook) {
+            if (isset($wp_filter[$hook])) {
+                foreach ($wp_filter[$hook]->callbacks as $priority => $callbacks) {
+                    foreach ($callbacks as $callback_id => $callback) {
+                        // Skip our own notices and WordPress core notices
+                        if (strpos($callback_id, 'top_up_agent') !== false || 
+                            strpos($callback_id, 'Top_Up_Agent') !== false ||
+                            strpos($callback_id, 'wp_') === 0) {
+                            continue;
+                        }
+                        
+                        remove_action($hook, $callback['function'], $priority);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Add JavaScript to hide any notices that slip through
+     */
+    public function hide_notices_javascript() {
+        ?>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    // Hide all notices except our own
+    $('.notice, .update-nag, .error, .updated, #message').each(function() {
+        var $notice = $(this);
+        var noticeHtml = $notice.html();
+
+        // Keep our notices and critical WordPress notices
+        if (noticeHtml.indexOf('top-up-agent-notice') === -1 &&
+            noticeHtml.indexOf('Top Up Agent') === -1 &&
+            !$notice.hasClass('top-up-agent-notice')) {
+            $notice.hide();
+        }
+    });
+
+    // Hide specific plugin notices by common selectors
+    $('div[id*="elementor"], div[id*="nextend"], div[class*="elementor"], div[class*="nextend"]').each(
+    function() {
+        if ($(this).hasClass('notice') || $(this).hasClass('error') || $(this).hasClass('updated')) {
+            $(this).hide();
+        }
+    });
+
+    // Remove any notices that get added dynamically
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1) { // Element node
+                    var $node = $(node);
+                    if ($node.hasClass('notice') || $node.hasClass('error') || $node
+                        .hasClass('updated')) {
+                        if ($node.html().indexOf('Top Up Agent') === -1 &&
+                            !$node.hasClass('top-up-agent-notice')) {
+                            $node.hide();
+                        }
+                    }
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+});
+</script>
+<?php
+    }
+    
+    /**
+     * Add CSS to hide admin notices from other plugins
+     */
+    public function hide_admin_notices_css() {
+        // Only apply on our admin pages
+        if (!$this->is_our_admin_page()) {
+            return;
+        }
+        
+        echo '<style>
+            /* Hide ALL notices by default - very aggressive approach */
+            .notice,
+            .update-nag,
+            .error,
+            .updated,
+            #message,
+            .wrap .notice,
+            .wrap .error,
+            .wrap .updated,
+            .wrap #message,
+            .notice-warning,
+            .notice-error,
+            .notice-success,
+            .notice-info,
+            .admin-notice,
+            .plugin-update-tr,
+            .update-message,
+            .inline-notice,
+            .notice-large {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Show only our notices */
+            .top-up-agent-notice,
+            .notice.top-up-agent-notice,
+            .error.top-up-agent-notice,
+            .updated.top-up-agent-notice {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                height: auto !important;
+                overflow: visible !important;
+                margin: 5px 15px 2px !important;
+                padding: 1px 12px !important;
+            }
+            
+            /* Hide specific plugin notices we know about */
+            div[id*="elementor"],
+            div[class*="elementor"],
+            div[id*="nextend"],
+            div[class*="nextend"],
+            .elementor-notice,
+            .nextend-notice,
+            .woocommerce-message,
+            .wc-connect-notice,
+            .jetpack-message,
+            .akismet-notice,
+            .yoast-notice,
+            .rank-math-notice,
+            .wpforms-notice {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            /* Hide license/update related notices from other plugins */
+            .notice[class*="license"],
+            .notice[class*="update"],
+            .notice[class*="expired"],
+            .notice[class*="activate"],
+            .error[class*="license"],
+            .updated[class*="license"] {
+                display: none !important;
+            }
+            
+            /* Keep critical WordPress core notices visible */
+            .notice-error.notice-alt,
+            .notice-warning.notice-alt {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+        </style>';
+    }
+    
+    /**
+     * Add a Top Up Agent specific admin notice that won't be hidden
+     * 
+     * @param string $message The notice message
+     * @param string $type Notice type: 'success', 'error', 'warning', 'info'
+     * @param bool $dismissible Whether the notice is dismissible
+     */
+    public static function add_admin_notice($message, $type = 'info', $dismissible = true) {
+        $class = 'notice top-up-agent-notice notice-' . $type;
+        if ($dismissible) {
+            $class .= ' is-dismissible';
+        }
+        
+        add_action('admin_notices', function() use ($message, $class) {
+            echo '<div class="' . esc_attr($class) . '">';
+            echo '<p><strong>Top Up Agent:</strong> ' . esc_html($message) . '</p>';
+            echo '</div>';
+        });
     }
     
     /**

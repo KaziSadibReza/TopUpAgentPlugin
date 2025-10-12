@@ -1,5 +1,26 @@
 {
-  "require": {
-    "guzzlehttp/guzzle": "^7.0"
+  "require": {},
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  },
+  "autoload": {
+    "psr-4": {
+      "TopUpAgent\\": "includes/"
+    },
+    "classmap": [
+      "includes/"
+    ]
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "@download-assets"
+    ],
+    "download-assets": [
+      "TopUpAgent\\Core\\AssetDownloader::downloadAssets"
+    ]
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
   }
 }

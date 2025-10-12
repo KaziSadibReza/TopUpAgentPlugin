@@ -7,4 +7,21 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'TopUpAgent\\Core\\AssetDownloader' => $baseDir . '/includes/core/class-asset-downloader.php',
+    'Top_Up_Agent_API_Client' => $baseDir . '/includes/api-integration/class-api-client.php',
+    'Top_Up_Agent_Admin' => $baseDir . '/includes/core/class-top-up-agent-admin.php',
+    'Top_Up_Agent_Asset_Handler' => $baseDir . '/includes/core/class-top-up-agent-asset-handler.php',
+    'Top_Up_Agent_Automation_Database_Manager' => $baseDir . '/includes/automation/class-top-up-agent-automation-database-manager.php',
+    'Top_Up_Agent_Automation_Manager' => $baseDir . '/includes/automation/class-top-up-agent-automation-manager.php',
+    'Top_Up_Agent_Form_Handler' => $baseDir . '/includes/ui/class-top-up-agent-form-handler.php',
+    'Top_Up_Agent_License_Key_Manager' => $baseDir . '/includes/license-management/class-top-up-agent-license-key-manager.php',
+    'Top_Up_Agent_License_Keys_Controller' => $baseDir . '/includes/license-management/class-top-up-agent-license-keys-controller.php',
+    'Top_Up_Agent_Player_ID_Detector' => $baseDir . '/includes/automation/class-top-up-agent-player-id-detector.php',
+    'Top_Up_Agent_Product_Eligibility_Checker' => $baseDir . '/includes/automation/class-top-up-agent-product-eligibility-checker.php',
+    'Top_Up_Agent_Product_Manager' => $baseDir . '/includes/license-management/class-top-up-agent-product-manager.php',
+    'Top_Up_Agent_UI_Renderer' => $baseDir . '/includes/ui/class-top-up-agent-ui-renderer.php',
+    'Top_Up_Agent_WebSocket_Integration' => $baseDir . '/includes/api-integration/class-websocket-integration.php',
+    'Top_Up_Agent_Webhook_Handler' => $baseDir . '/includes/api-integration/class-top-up-agent-webhook-handler.php',
+    'Top_Up_Agent_WooCommerce_Integration' => $baseDir . '/includes/woocommerce/class-top-up-agent-woocommerce.php',
+    'Top_Up_Agent_WooCommerce_Template_Helper' => $baseDir . '/includes/woocommerce/class-top-up-agent-woocommerce-template-helper.php',
 );

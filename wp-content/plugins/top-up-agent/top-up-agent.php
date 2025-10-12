@@ -23,10 +23,16 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
+// Load asset downloader class
+require_once __DIR__ . '/includes/core/class-asset-downloader.php';
+
 // Plugin activation hook
 register_activation_hook(__FILE__, 'top_up_agent_activate');
 function top_up_agent_activate() {
 	global $wpdb;
+	
+	// Download required assets during activation
+	\TopUpAgent\Core\AssetDownloader::downloadOnActivation();
 	
 	// Create license keys table
 	$license_table = $wpdb->prefix . 'top_up_agent_license_keys';
@@ -64,6 +70,7 @@ function top_up_agent_activate() {
 
 // Load core classes
 require_once plugin_dir_path(__FILE__) . 'includes/core/class-top-up-agent-admin.php';
+require_once plugin_dir_path(__FILE__) . 'includes/core/class-top-up-agent-asset-handler.php';
 
 // Load new API integration system
 require_once plugin_dir_path(__FILE__) . 'includes/api-integration/class-api-client.php';
@@ -87,6 +94,9 @@ require_once plugin_dir_path(__FILE__) . 'includes/ui/class-top-up-agent-ui-rend
 
 // Initialize admin
 new Top_Up_Agent_Admin();
+
+// Initialize Asset Handler
+Top_Up_Agent_Asset_Handler::get_instance();
 
 // Initialize WebSocket integration
 new Top_Up_Agent_WebSocket_Integration();

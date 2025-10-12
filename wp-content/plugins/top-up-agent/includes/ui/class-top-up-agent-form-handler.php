@@ -86,20 +86,6 @@ class Top_Up_Agent_Form_Handler {
             }
         }
 
-        // Handle test automation
-        if (isset($_POST['test_automation']) && check_admin_referer('test_automation')) {
-            $selected_products = isset($_POST['test_products']) ? array_map('intval', $_POST['test_products']) : [];
-            
-            $result = $this->automation_manager->test_automation($selected_products);
-            
-            if ($result['success']) {
-                $results_text = implode('<br>', $result['results']);
-                $message = "<div class='updated'><p>✅ Test automation completed:<br>{$results_text}</p></div>";
-            } else {
-                $message = "<div class='error'><p>❌ {$result['message']}</p></div>";
-            }
-        }
-
         // Handle group automation
         if (isset($_POST['group_automation']) && check_admin_referer('group_automation')) {
             $player_id = sanitize_text_field($_POST['player_id']);

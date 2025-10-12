@@ -42,108 +42,38 @@ class Top_Up_Agent_Automation_Manager {
         return $result || $values_match;
     }
 
-    public function test_automation($selected_products) {
-        if (empty($selected_products)) {
-            return [
-                'success' => false,
-                'message' => 'Please select at least one product for automation test.'
-            ];
-        }
-
-        $test_results = [];
-        
-        foreach ($selected_products as $product_id) {
-            // Check if we have available license keys for this product
-            $license_key_count = $this->license_manager->get_unused_license_key_count($product_id);
-            
-            if ($license_key_count == 0) {
-                $test_results[] = "Product ID $product_id: No available license keys";
-                continue;
-            }
-            
-            // Simulate test
-            $test_player_id = 'test_player_' . time();
-            $automation_result = $this->api->execute_automation($test_player_id, 'test_123');
-            $test_results[] = "Product ID $product_id: " . (!is_wp_error($automation_result) ? "Success" : "Failed");
-        }
-        
-        return [
-            'success' => true,
-            'results' => $test_results
-        ];
-    }
-
     public function render_automation_settings_form() {
         $enabled_products = $this->get_automation_enabled_products();
         $all_products = $this->product_manager->get_all_products();
         ?>
-        <div class="card">
-            <h2>Automation Settings</h2>
-            <form method="post">
-                <?php wp_nonce_field('update_automation_settings'); ?>
-                <h3>Enable Automation for Products:</h3>
-                <select name="automation_enabled_products[]" id="automation_enabled_products" multiple class="modern-select">
-                    <?php foreach ($all_products as $product): ?>
-                        <?php 
+<div class="card">
+    <h2>Automation Settings</h2>
+    <form method="post">
+        <?php wp_nonce_field('update_automation_settings'); ?>
+        <h3>Enable Automation for Products:</h3>
+        <select name="automation_enabled_products[]" id="automation_enabled_products" multiple class="modern-select">
+            <?php foreach ($all_products as $product): ?>
+            <?php 
                         $enabled = in_array($product['id'], $enabled_products);
                         $has_license_keys = $this->license_manager->get_unused_license_key_count($product['id']);
                         ?>
-                        <option value="<?php echo $product['id']; ?>" <?php echo $enabled ? 'selected' : ''; ?> <?php echo !$has_license_keys ? 'style="color: red;"' : ''; ?>>
-                            <?php echo esc_html($product['name'] . ' (ID: ' . $product['id'] . ')'); ?>
-                            <?php if ($product['type'] === 'variation'): ?>
-                                - Variation
-                            <?php endif; ?>
-                            <?php if (!$has_license_keys): ?>
-                                (No license keys available)
-                            <?php endif; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <p class="submit">
-                    <input type="submit" name="update_automation_settings" class="button-primary" value="Update Settings">
-                </p>
-            </form>
-        </div>
-        <?php
-    }
-
-    public function render_test_automation_form() {
-        $enabled_products = $this->get_automation_enabled_products();
-        $all_products = $this->product_manager->get_all_products();
-        ?>
-        <div class="card">
-            <h2>Test Automation</h2>
-            <form method="post">
-                <?php wp_nonce_field('test_automation'); ?>
-                <p><strong>Select products to test automation:</strong></p>
-                
-                <select name="test_products[]" id="test_products" multiple class="modern-select">
-                    <?php 
-                    foreach ($all_products as $product): 
-                        // Only show enabled products
-                        if (in_array($product['id'], $enabled_products)):
-                            $has_license_keys = $this->license_manager->get_unused_license_key_count($product['id']);
-                    ?>
-                        <option value="<?php echo $product['id']; ?>" <?php echo $has_license_keys ? '' : 'style="color: red;"'; ?>>
-                            <?php echo esc_html($product['name'] . ' (ID: ' . $product['id'] . ')'); ?>
-                            <?php if ($product['type'] === 'variation'): ?>
-                                - Variation
-                            <?php endif; ?>
-                            <?php if (!$has_license_keys): ?>
-                                (No license keys)
-                            <?php endif; ?>
-                        </option>
-                    <?php 
-                        endif;
-                    endforeach; 
-                    ?>
-                </select>
-                
-                <p class="submit">
-                    <input type="submit" name="test_automation" class="button-primary" value="Run Test Automation">
-                </p>
-            </form>
-        </div>
-        <?php
+            <option value="<?php echo $product['id']; ?>" <?php echo $enabled ? 'selected' : ''; ?>
+                <?php echo !$has_license_keys ? 'style="color: red;"' : ''; ?>>
+                <?php echo esc_html($product['name'] . ' (ID: ' . $product['id'] . ')'); ?>
+                <?php if ($product['type'] === 'variation'): ?>
+                - Variation
+                <?php endif; ?>
+                <?php if (!$has_license_keys): ?>
+                (No license keys available)
+                <?php endif; ?>
+            </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="submit">
+            <input type="submit" name="update_automation_settings" class="button-primary" value="Update Settings">
+        </p>
+    </form>
+</div>
+<?php
     }
 }

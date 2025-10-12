@@ -6,52 +6,39 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit045658d81f6d9d3243e731dda7bf04d1
 {
-    public static $files = array (
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        'T' => 
         array (
-            'Psr\\Http\\Message\\' => 17,
-            'Psr\\Http\\Client\\' => 16,
-        ),
-        'G' => 
-        array (
-            'GuzzleHttp\\Psr7\\' => 16,
-            'GuzzleHttp\\Promise\\' => 19,
-            'GuzzleHttp\\' => 11,
+            'TopUpAgent\\' => 11,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Psr\\Http\\Message\\' => 
+        'TopUpAgent\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
-        ),
-        'Psr\\Http\\Client\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/http-client/src',
-        ),
-        'GuzzleHttp\\Psr7\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
-        ),
-        'GuzzleHttp\\Promise\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
-        ),
-        'GuzzleHttp\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+            0 => __DIR__ . '/../..' . '/includes',
         ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'TopUpAgent\\Core\\AssetDownloader' => __DIR__ . '/../..' . '/includes/core/class-asset-downloader.php',
+        'Top_Up_Agent_API_Client' => __DIR__ . '/../..' . '/includes/api-integration/class-api-client.php',
+        'Top_Up_Agent_Admin' => __DIR__ . '/../..' . '/includes/core/class-top-up-agent-admin.php',
+        'Top_Up_Agent_Asset_Handler' => __DIR__ . '/../..' . '/includes/core/class-top-up-agent-asset-handler.php',
+        'Top_Up_Agent_Automation_Database_Manager' => __DIR__ . '/../..' . '/includes/automation/class-top-up-agent-automation-database-manager.php',
+        'Top_Up_Agent_Automation_Manager' => __DIR__ . '/../..' . '/includes/automation/class-top-up-agent-automation-manager.php',
+        'Top_Up_Agent_Form_Handler' => __DIR__ . '/../..' . '/includes/ui/class-top-up-agent-form-handler.php',
+        'Top_Up_Agent_License_Key_Manager' => __DIR__ . '/../..' . '/includes/license-management/class-top-up-agent-license-key-manager.php',
+        'Top_Up_Agent_License_Keys_Controller' => __DIR__ . '/../..' . '/includes/license-management/class-top-up-agent-license-keys-controller.php',
+        'Top_Up_Agent_Player_ID_Detector' => __DIR__ . '/../..' . '/includes/automation/class-top-up-agent-player-id-detector.php',
+        'Top_Up_Agent_Product_Eligibility_Checker' => __DIR__ . '/../..' . '/includes/automation/class-top-up-agent-product-eligibility-checker.php',
+        'Top_Up_Agent_Product_Manager' => __DIR__ . '/../..' . '/includes/license-management/class-top-up-agent-product-manager.php',
+        'Top_Up_Agent_UI_Renderer' => __DIR__ . '/../..' . '/includes/ui/class-top-up-agent-ui-renderer.php',
+        'Top_Up_Agent_WebSocket_Integration' => __DIR__ . '/../..' . '/includes/api-integration/class-websocket-integration.php',
+        'Top_Up_Agent_Webhook_Handler' => __DIR__ . '/../..' . '/includes/api-integration/class-top-up-agent-webhook-handler.php',
+        'Top_Up_Agent_WooCommerce_Integration' => __DIR__ . '/../..' . '/includes/woocommerce/class-top-up-agent-woocommerce.php',
+        'Top_Up_Agent_WooCommerce_Template_Helper' => __DIR__ . '/../..' . '/includes/woocommerce/class-top-up-agent-woocommerce-template-helper.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
