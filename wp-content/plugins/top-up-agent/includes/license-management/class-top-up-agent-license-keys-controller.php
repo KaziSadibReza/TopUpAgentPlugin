@@ -63,7 +63,6 @@ class Top_Up_Agent_License_Keys_Controller {
     <!-- Section Toggle Controls -->
     <?php if (!$edit_key && !$edit_group_id): ?>
     <div class="section-toggles">
-        <h3>📋 Manage Sections</h3>
         <button type="button" class="toggle-btn" data-target="add-license-section">
             <span class="text">Add New License Key</span>
             <span class="section-status hidden">Hidden</span>

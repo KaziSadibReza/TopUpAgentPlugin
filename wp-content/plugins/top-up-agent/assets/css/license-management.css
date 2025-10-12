@@ -125,17 +125,19 @@ To change the theme colors, simply modify the variables in the :root section abo
 
 Examples:
 - Primary theme: Change --primary-blue, --primary-blue-dark, etc.
-- Success theme: Change --green, --green-dark, etc.
+- Success/Available states: Change --green, --green-dark, etc.
 - Error theme: Change --red, --red-dark, etc.
 - Backgrounds: Change --bg-primary, --bg-secondary, etc.
 - Text colors: Change --text-primary, --text-secondary, etc.
 
 Common patterns:
-- var(--primary-blue) for main blue color
-- var(--gradient-primary) for blue gradients
+- var(--primary-blue) for main theme color (buttons, links, focus states)
+- var(--gradient-primary) for primary blue gradients
+- var(--green) for success states and available items
+- var(--red) for errors and used/unavailable items
 - var(--text-primary) for main text
 - var(--border-primary) for borders
-- var(--shadow-blue) for blue shadows
+- var(--shadow-blue) for primary blue shadows
 - var(--radius-md) for border radius
 - var(--transition-fast) for animations
 
@@ -206,13 +208,13 @@ This system ensures consistent theming across the entire interface.
 
 /* Active state for toggle buttons */
 .toggle-btn.active {
-  background: var(--gradient-green);
-  box-shadow: 0 2px 4px var(--shadow-md);
+  background: var(--gradient-primary-alt);
+  box-shadow: 0 2px 4px var(--shadow-blue-md);
 }
 
 .toggle-btn.active:hover {
-  background: var(--gradient-green-hover);
-  box-shadow: 0 4px 8px var(--shadow-md);
+  background: var(--gradient-primary-alt-hover);
+  box-shadow: 0 4px 8px var(--shadow-blue-lg);
 }
 
 .toggle-btn .text {
@@ -317,20 +319,6 @@ This system ensures consistent theming across the entire interface.
   box-shadow: 0 6px 16px var(--shadow-md);
 }
 
-/* Add a subtle indicator for collapsible sections */
-.collapsible-section .license-form-container::before,
-.collapsible-section .card::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  height: 4px;
-  background: var(--gradient-primary);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  opacity: 0.8;
-}
-
 /* Section headers within collapsible areas */
 .collapsible-section h2 {
   color: var(--text-primary);
@@ -349,8 +337,8 @@ This system ensures consistent theming across the entire interface.
 }
 
 .section-status.visible {
-  background: var(--green-light);
-  color: var(--green-text);
+  background: var(--bg-blue-light);
+  color: var(--primary-blue-dark);
 }
 
 .section-status.hidden {
@@ -1548,9 +1536,9 @@ label[for="is_group_product"]:hover {
   .select2-container--default
     .select2-selection--multiple
     .select2-selection__choice {
-    max-width: 150px !important;
+    width: 310px !important;
     font-size: 11px !important;
-    padding: 3px 6px !important;
+    padding: 18px 10px !important;
   }
 
   .select2-container--default
