@@ -414,6 +414,8 @@
       "add-license-section",
       "bulk-import-section",
       "automation-section",
+      "filter-section",
+      "export-section",
     ];
 
     sections.forEach((sectionId) => {
@@ -430,6 +432,9 @@
         }
       }
     });
+
+    // Create toggle buttons for filter and export sections if they don't exist
+    createMissingToggleButtons();
 
     // Handle toggle button clicks
     $(".toggle-btn").on("click", function (e) {
@@ -473,6 +478,74 @@
         }
       }
     });
+  }
+
+  /**
+   * Create toggle buttons for filter and export sections if they don't exist
+   */
+  function createMissingToggleButtons() {
+    // Check for search filter panel and create toggle if needed
+    const searchFilterPanel = $(".search-filter-panel");
+    if (
+      searchFilterPanel.length &&
+      !$('.toggle-btn[data-target="filter-section"]').length
+    ) {
+      createToggleButton(
+        "filter-section",
+        "Search & Filter Options",
+        searchFilterPanel
+      );
+    }
+
+    // Check for export panel and create toggle if needed
+    const exportPanel = $(".export-panel");
+    if (
+      exportPanel.length &&
+      !$('.toggle-btn[data-target="export-section"]').length
+    ) {
+      createToggleButton("export-section", "Export Options", exportPanel);
+    }
+  }
+
+  /**
+   * Create a toggle button for a specific section
+   */
+  function createToggleButton(sectionId, buttonText, targetElement) {
+    // Add ID to target element if it doesn't have one
+    if (!targetElement.attr("id")) {
+      targetElement.attr("id", sectionId);
+    }
+
+    // Find or create section toggles container
+    let toggleContainer = $(".section-toggles");
+    if (!toggleContainer.length) {
+      toggleContainer = $('<div class="section-toggles"></div>');
+      targetElement.before(toggleContainer);
+    }
+
+    // Create toggle button using existing structure
+    const toggleBtn = $(`
+      <button type="button" class="toggle-btn" data-target="${sectionId}">
+        <span class="text">${buttonText}</span>
+        <span class="section-status hidden">Hidden</span>
+      </button>
+    `);
+
+    toggleContainer.append(toggleBtn);
+
+    // Initialize the section state
+    const savedStates = JSON.parse(
+      localStorage.getItem("licensePageSections") || "{}"
+    );
+    const isVisible = savedStates[sectionId] === true;
+
+    if (isVisible) {
+      targetElement.removeClass("hidden").addClass("revealing");
+      updateToggleButton(sectionId, true);
+    } else {
+      targetElement.addClass("hidden");
+      updateToggleButton(sectionId, false);
+    }
   }
 
   /**

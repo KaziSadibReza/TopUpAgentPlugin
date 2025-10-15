@@ -80,7 +80,7 @@ class Top_Up_Agent_UI_Renderer {
             <div class="filter-group">
                 <label for="search">Search License Keys</label>
                 <input type="text" name="search" id="search" value="<?php echo esc_attr($search); ?>"
-                    placeholder="Search by license key..." class="filter-input">
+                    placeholder="Search by license key..." class="filter-input custom_filter">
             </div>
 
             <div class="filter-group">

@@ -327,6 +327,143 @@ This system ensures consistent theming across the entire interface.
   margin-bottom: var(--space-xl);
 }
 
+/* Filter Section Toggle Button */
+.filter-toggle-btn,
+.export-toggle-btn {
+  padding: var(--space-md) var(--space-xl);
+  background: var(--gradient-primary);
+  color: var(--text-white);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: var(--transition-fast);
+  box-shadow: 0 2px 4px var(--shadow-blue-md);
+  position: relative;
+  min-width: 200px;
+  justify-content: space-between;
+  margin: 0 0 var(--space-lg) 0;
+  width: 100%;
+  max-width: 300px;
+}
+
+.filter-toggle-btn:hover,
+.export-toggle-btn:hover {
+  background: var(--gradient-primary-hover);
+  color: var(--text-white);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-blue-lg);
+}
+
+.filter-toggle-btn:focus,
+.export-toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--shadow-blue);
+}
+
+.filter-toggle-btn.active,
+.export-toggle-btn.active {
+  background: var(--gradient-primary-alt);
+}
+
+.filter-toggle-btn.active:hover,
+.export-toggle-btn.active:hover {
+  background: var(--gradient-primary-alt-hover);
+}
+
+.filter-toggle-btn .text,
+.export-toggle-btn .text {
+  flex: 1;
+  text-align: left;
+}
+
+.filter-toggle-btn::after,
+.export-toggle-btn::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid currentColor;
+  transition: transform 0.3s ease;
+}
+
+.filter-toggle-btn.active::after,
+.export-toggle-btn.active::after {
+  transform: rotate(180deg);
+}
+
+.filter-toggle-btn:hover::after,
+.export-toggle-btn:hover::after {
+  transform: scale(1.1);
+}
+
+.filter-toggle-btn.active:hover::after,
+.export-toggle-btn.active:hover::after {
+  transform: rotate(180deg) scale(1.1);
+}
+
+/* Filter and Export Section Collapsible */
+.filter-section-collapsible,
+.export-section-collapsible {
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
+}
+
+.filter-section-collapsible.hidden,
+.export-section-collapsible.hidden {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.filter-section-collapsible.revealing,
+.export-section-collapsible.revealing {
+  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.filter-section-collapsible.hiding,
+.export-section-collapsible.hiding {
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    max-height: 1000px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 /* Status indicators */
 .section-status {
   font-size: 12px;
@@ -353,13 +490,59 @@ This system ensures consistent theming across the entire interface.
     gap: var(--space-sm);
   }
 
-  .toggle-btn {
-    width: 100%;
-    min-width: auto;
+  .toggle-btn,
+  .filter-toggle-btn,
+  .export-toggle-btn {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: auto !important;
+    justify-content: space-between !important;
   }
 
   .collapsible-section {
     margin: var(--space-lg) 0;
+  }
+
+  .filter-section-collapsible.hidden,
+  .export-section-collapsible.hidden {
+    margin: 0;
+  }
+
+  /* Filter Grid Mobile Responsive */
+  .filter-grid,
+  .license-manager-filters .filter-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+
+  .filter-actions {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .filter-actions .btn {
+    width: 100% !important;
+    min-height: 44px !important;
+  }
+
+  .filter-input,
+  .filter-select {
+    min-height: 44px !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+
+  /* Export Panel Mobile */
+  .export-panel .export-buttons,
+  .export-panel .form-actions {
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+
+  .export-panel .btn,
+  .export-panel .btn-export {
+    width: 100% !important;
+    min-width: auto !important;
   }
 }
 
@@ -693,7 +876,11 @@ This system ensures consistent theming across the entire interface.
   .action-buttons .btn {
     width: 50%;
     justify-content: center;
+    align-items: center;
     padding: var(--space-xs);
+  }
+  .action-buttons form {
+    text-align: center;
   }
 }
 
@@ -914,15 +1101,29 @@ label[for="is_group_product"]:hover {
   flex-direction: column;
 }
 
-/* Panel Containers */
-.search-filter-panel {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin: 20px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+/* Panel Containers - Modern Design System */
+.search-filter-panel,
+.license-manager-filters,
+.export-panel,
+.license-table-container {
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  box-shadow: 0 4px 12px var(--shadow-sm);
+  transition: var(--transition-fast);
+  padding: var(--space-xl);
+  margin: var(--space-xl) 0;
+  position: relative;
   clear: both;
   overflow: hidden;
+}
+
+.search-filter-panel:hover,
+.license-manager-filters:hover,
+.export-panel:hover,
+.license-table-container:hover {
+  border-color: var(--border-focus);
+  box-shadow: 0 6px 16px var(--shadow-md);
 }
 
 .search-filter-panel::after {
@@ -931,19 +1132,16 @@ label[for="is_group_product"]:hover {
   clear: both;
 }
 
-.search-filter-panel h3 {
-  margin: 0 0 20px 0;
-  font-size: 18px;
+.search-filter-panel h3,
+.license-manager-filters h3,
+.export-panel h3,
+.license-table-container h3 {
   color: var(--text-primary);
-}
-
-.export-panel,
-.license-table-container {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin: 20px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid var(--border-primary);
+  padding-bottom: var(--space-md);
+  margin: 0 0 var(--space-xl) 0;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .export-panel h3,
@@ -962,16 +1160,29 @@ label[for="is_group_product"]:hover {
 .license-manager-filters .filter-grid {
   display: grid !important;
   grid-template-columns: 2fr 1fr 1.5fr auto !important;
-  gap: 20px !important;
+  gap: var(--space-lg) !important;
   align-items: end !important;
-  background: #f8fafc !important;
-  padding: 20px !important;
-  border-radius: 12px !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  background: var(--bg-secondary) !important;
+  padding: var(--space-lg) !important;
+  border-radius: var(--radius-md) !important;
+  border: 2px solid var(--border-primary) !important;
+  box-shadow: 0 2px 6px var(--shadow-sm) !important;
   float: none !important;
   width: 100% !important;
   margin: 0 !important;
+  transition: var(--transition-fast) !important;
+  box-sizing: border-box !important;
+}
+
+.filter-grid:hover,
+.license-manager-filters .filter-grid:hover {
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 4px 12px var(--shadow-md) !important;
+  background: var(--bg-primary) !important;
+}
+.search-filter-panel .filter-form .filter-grid .filter-group .custom_filter {
+  padding: 6px !important;
+  margin-bottom: -4px !important;
 }
 
 .filter-group,
@@ -990,40 +1201,50 @@ label[for="is_group_product"]:hover {
 }
 
 .filter-group label {
-  display: block !important;
-  font-weight: 600 !important;
-  margin-bottom: 8px !important;
-  color: #374151 !important;
-  font-size: 13px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 14px;
 }
 
-/* Form Controls */
+/* Form Controls - Matching .form-input Style */
 .filter-input,
-.filter-select {
-  width: 100% !important;
-  padding: 12px 16px !important;
-  border: 2px solid #e5e7eb !important;
-  border-radius: 8px !important;
-  font-size: 14px !important;
-  transition: all 0.2s ease !important;
-  background: white !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+.filter-select,
+.search-filter-panel input,
+.search-filter-panel select,
+.license-manager-filters input,
+.license-manager-filters select,
+.export-panel input,
+.export-panel select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-secondary) !important;
+  border: 2px solid var(--border-primary) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 14px;
+  transition: var(--transition-fast);
   margin: 0 !important;
+  color: var(--text-primary);
+  box-sizing: border-box;
 }
 
 .filter-input:focus,
-.filter-select:focus {
-  outline: none !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-  transform: translateY(-1px) !important;
+.filter-select:focus,
+.search-filter-panel input:focus,
+.search-filter-panel select:focus,
+.license-manager-filters input:focus,
+.license-manager-filters select:focus,
+.export-panel input:focus,
+.export-panel select:focus {
+  outline: none;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px var(--shadow-blue) !important;
 }
 
 .filter-input::placeholder {
-  color: #9ca3af !important;
-  font-style: italic !important;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 /* Button System */
@@ -1077,20 +1298,107 @@ label[for="is_group_product"]:hover {
   text-decoration: none;
 }
 
-/* Filter-specific button styling */
+/* Filter-specific button styling - Match Plugin Colors */
+.filter-actions {
+  display: flex !important;
+  gap: 8px !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
 .filter-actions .btn {
   width: 100%;
-  font-size: 13px;
-  padding: 10px 16px;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: var(--transition-fast);
+  box-sizing: border-box;
+  min-height: 44px;
 }
 
 .filter-actions .btn-primary {
-  background: var(--gradient-green);
-  border-color: var(--green);
+  background: var(--gradient-primary);
+  color: var(--text-white);
+  border-color: transparent;
 }
 
 .filter-actions .btn-primary:hover {
-  background: var(--gradient-green-hover);
+  background: var(--gradient-primary-hover);
+  color: var(--text-white);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-blue-md);
+}
+
+.filter-actions .btn-primary {
+  background: var(--gradient-primary);
+  color: var(--text-white);
+  border-color: transparent;
+}
+
+.filter-actions .btn-primary:hover {
+  background: var(--gradient-primary-hover);
+}
+
+/* Export Panel Modern Styling */
+.export-panel .export-buttons,
+.export-panel .form-actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: var(--space-lg);
+}
+
+.export-panel .btn,
+.export-panel .btn-export {
+  flex: 1;
+  min-width: 140px;
+  background: var(--gradient-primary);
+  color: var(--text-white);
+  border: 2px solid transparent;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  box-shadow: 0 2px 4px var(--shadow-blue-md);
+}
+
+.export-panel .btn:hover,
+.export-panel .btn-export:hover {
+  background: var(--gradient-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-blue-lg);
+}
+
+.export-panel .btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-primary);
+}
+
+.export-panel .btn-secondary:hover {
+  background: var(--bg-primary);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--shadow-md);
 }
 
 .btn-export {
@@ -1101,6 +1409,83 @@ label[for="is_group_product"]:hover {
 
 .btn-export:hover {
   background: var(--green-dark);
+}
+
+/* Panel Accessibility and Enhanced States */
+.search-filter-panel:focus-within,
+.license-manager-filters:focus-within,
+.export-panel:focus-within {
+  border-color: var(--primary-blue);
+  box-shadow: 0 6px 16px var(--shadow-blue-md);
+}
+
+/* Enhanced Form Label Styling */
+.search-filter-panel label,
+.license-manager-filters label,
+.export-panel label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  display: block;
+  font-size: 14px;
+}
+
+.search-filter-panel label.required::after,
+.license-manager-filters label.required::after,
+.export-panel label.required::after {
+  content: " *";
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* Panel Loading States */
+.search-filter-panel.loading,
+.license-manager-filters.loading,
+.export-panel.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.search-filter-panel.loading::after,
+.license-manager-filters.loading::after,
+.export-panel.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--border-primary);
+  border-top-color: var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 10;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Panel Content Animation */
+.search-filter-panel > *,
+.license-manager-filters > *,
+.export-panel > * {
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Active Filters */
@@ -1388,47 +1773,61 @@ label[for="is_group_product"]:hover {
   padding: 0;
 }
 
-/* Select2 Enhanced Styling */
+/* Select2 Enhanced Styling - Modern Design System */
 .select2-container {
   width: 100% !important;
 }
 
+.select2-container--default .select2-selection--multiple,
+.select2-container--default .select2-selection--single {
+  border: 2px solid var(--border-primary) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-secondary) !important;
+  transition: var(--transition-fast) !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+}
+
 .select2-container--default .select2-selection--multiple {
-  border: 2px solid #e5e7eb !important;
-  border-radius: 8px !important;
   min-height: 44px !important;
   padding: 8px 45px 8px 8px !important;
-  background: white !important;
 }
 
 .select2-container--default .select2-selection--single {
-  border: 2px solid #e5e7eb !important;
-  border-radius: 8px !important;
   height: 44px !important;
-  background: white !important;
+  padding: 0 !important;
 }
 
 .select2-container--default
   .select2-selection--single
   .select2-selection__rendered {
-  line-height: 40px !important;
+  line-height: 42px !important;
   padding-left: 12px !important;
-  color: #374151 !important;
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
 }
 
 .select2-container--default
   .select2-selection--single
   .select2-selection__arrow {
   height: 40px !important;
-  right: 8px !important;
+  right: var(--space-sm) !important;
+}
+
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__arrow
+  b {
+  border-color: var(--text-light) transparent transparent transparent !important;
+  border-width: 6px 6px 0 6px !important;
 }
 
 .select2-container--default.select2-container--focus
   .select2-selection--multiple,
 .select2-container--default.select2-container--focus
   .select2-selection--single {
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 1px #3b82f6 !important;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px var(--shadow-blue) !important;
 }
 
 .select2-container--default
@@ -1438,40 +1837,40 @@ label[for="is_group_product"]:hover {
   margin: 0 !important;
   display: flex !important;
   flex-wrap: wrap !important;
-  gap: 6px !important;
+  gap: var(--space-xs) !important;
 }
 
 .select2-container--default
   .select2-selection--multiple
   .select2-selection__choice {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  background: var(--gradient-primary) !important;
   border: none !important;
-  border-radius: 8px !important;
-  padding: 16px 18px !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 20px !important;
   margin: 0px !important;
   font-size: 12px !important;
-  color: white !important;
+  color: var(--text-white) !important;
   width: 100% !important;
   white-space: nowrap !important;
   display: inline-flex;
   align-items: center !important;
-  gap: 6px !important;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
-  transition: all 0.2s ease !important;
+  gap: var(--space-xs) !important;
+  box-shadow: 0 2px 4px var(--shadow-blue-md) !important;
+  transition: var(--transition-fast) !important;
   position: relative !important;
 }
 
 .select2-container--default
   .select2-selection--multiple
   .select2-selection__choice:hover {
-  background: linear-gradient(135deg, #2563eb, #1e40af) !important;
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4) !important;
+  background: var(--gradient-primary-hover) !important;
+  box-shadow: 0 4px 8px var(--shadow-blue-lg) !important;
 }
 
 .select2-container--default
   .select2-selection--multiple
   .select2-selection__choice__display {
-  color: white !important;
+  color: var(--text-white) !important;
   font-weight: 500 !important;
   font-size: 11px !important;
   line-height: 1.3 !important;
@@ -1493,7 +1892,7 @@ label[for="is_group_product"]:hover {
   .select2-selection__choice__remove {
   background: rgba(255, 255, 255, 0.2) !important;
   border: none !important;
-  color: white !important;
+  color: var(--text-white) !important;
   font-size: 12px !important;
   padding-bottom: 2px !important;
   padding: 0px;
@@ -1549,54 +1948,100 @@ label[for="is_group_product"]:hover {
 .select2-container--default
   .select2-selection--multiple
   .select2-selection__clear {
-  background: #ef4444 !important;
+  background: var(--red) !important;
   height: 29px;
   width: 32px;
   display: flex;
   margin: 0px !important;
   border-radius: 125% !important;
-  color: white !important;
+  color: var(--text-white) !important;
   border: none !important;
   padding-bottom: 3px !important;
   font-size: 17px !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   position: absolute !important;
-  right: 8px !important;
-  top: 8px !important;
+  right: var(--space-sm) !important;
+  top: var(--space-sm) !important;
   justify-content: center;
   align-items: center;
+  transition: var(--transition-fast) !important;
 }
 
 .select2-container--default
   .select2-selection--multiple
   .select2-selection__clear:hover {
-  background: #dc2626 !important;
+  background: var(--red-dark) !important;
+}
+
+/* Select2 Clear Button Modern Styling */
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__clear {
+  background: var(--red) !important;
+  color: var(--text-white) !important;
+  border-radius: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin: 12px 8px 0 0 !important;
+  transition: var(--transition-fast) !important;
+  cursor: pointer !important;
+}
+
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__clear:hover {
+  background: var(--red-dark) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Enhanced Filter Form Styling */
+.filter-form {
+  margin-bottom: var(--space-lg);
+}
+
+.filter-form .filter-grid {
+  background: var(--bg-secondary) !important;
+  border: 2px solid var(--border-primary) !important;
+  box-shadow: 0 4px 12px var(--shadow-sm) !important;
+  transition: var(--transition-fast) !important;
+}
+
+.filter-form .filter-grid:hover {
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 6px 16px var(--shadow-md) !important;
+  background: var(--bg-primary) !important;
 }
 
 /* Filter Dropdown Special Styling */
 .filter-group .select2-container--default .select2-selection--single {
   height: 44px !important;
-  background: #f9fafb !important;
-  border: 2px solid #e5e7eb !important;
+  background: var(--bg-secondary) !important;
+  border: 2px solid var(--border-primary) !important;
+  transition: var(--transition-fast) !important;
 }
 
 .filter-group .select2-container--default .select2-selection--single:hover {
-  border-color: #d1d5db !important;
+  border-color: var(--border-secondary) !important;
+  background: var(--bg-primary) !important;
 }
 
 .filter-group
   .select2-container--default.select2-container--focus
   .select2-selection--single {
-  background: white !important;
-  border-color: #3b82f6 !important;
+  background: var(--bg-primary) !important;
+  border-color: var(--primary-blue) !important;
 }
 
 .filter-group
   .select2-container--default
   .select2-selection--single
   .select2-selection__rendered {
-  color: #374151 !important;
+  color: var(--text-primary) !important;
   font-weight: 500 !important;
 }
 
@@ -1604,16 +2049,17 @@ label[for="is_group_product"]:hover {
   .select2-container--default
   .select2-selection--single
   .select2-selection__placeholder {
-  color: #9ca3af !important;
+  color: var(--text-light) !important;
 }
 
 /* Select2 Dropdown */
 .select2-dropdown {
-  border: 2px solid #e5e7eb !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  border: 2px solid var(--border-primary) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 4px 6px -1px var(--shadow-md) !important;
   max-height: 300px !important;
   overflow-y: auto !important;
+  background: var(--bg-primary) !important;
 }
 
 .select2-results {
@@ -1649,17 +2095,17 @@ label[for="is_group_product"]:hover {
 }
 
 .select2-results::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--bg-tertiary);
   border-radius: 3px;
 }
 
 .select2-results::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border-secondary);
   border-radius: 3px;
 }
 
 .select2-results::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--text-light);
 }
 
 /* CSS Text Truncation for Select2 Options */
@@ -1708,46 +2154,81 @@ label[for="is_group_product"]:hover {
 }
 
 .select2-container--default .select2-results__option {
-  padding: 8px 12px !important;
+  padding: var(--space-sm) var(--space-md) !important;
   font-size: 13px !important;
-  border-bottom: 1px solid #f3f4f6 !important;
+  border-bottom: 1px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
+  transition: var(--transition-fast) !important;
 }
 
 .select2-container--default .select2-results__option--highlighted {
-  background: #eff6ff !important;
-  color: #1e40af !important;
+  background: var(--bg-blue-light) !important;
+  color: var(--primary-blue-darkest) !important;
 }
 
 .select2-container--default .select2-results__option[aria-selected="true"] {
-  background: #dbeafe !important;
-  color: #1e40af !important;
+  background: var(--bg-blue-light) !important;
+  color: var(--primary-blue-darkest) !important;
   font-weight: 600 !important;
 }
 
 .select2-container--default .select2-search--dropdown .select2-search__field {
-  border: 1px solid #d1d5db !important;
-  border-radius: 6px !important;
-  padding: 8px 12px !important;
+  border: 1px solid var(--border-secondary) !important;
+  border-radius: var(--radius-xs) !important;
+  padding: var(--space-sm) var(--space-md) !important;
   font-size: 14px !important;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: var(--transition-fast) !important;
 }
 
 .select2-container--default
   .select2-search--dropdown
   .select2-search__field:focus {
-  border-color: #3b82f6 !important;
+  border-color: var(--primary-blue) !important;
   outline: none !important;
-  box-shadow: 0 0 0 1px #3b82f6 !important;
+  box-shadow: 0 0 0 1px var(--primary-blue) !important;
 }
 
 .select2-container--default .select2-results__message {
-  padding: 16px !important;
+  padding: var(--space-lg) !important;
   text-align: center !important;
-  color: #6b7280 !important;
+  color: var(--text-secondary) !important;
   font-style: italic !important;
 }
 
 /* Mobile Responsive Design */
 @media (max-width: 480px) {
+  /* Panel Responsive Design */
+  .search-filter-panel,
+  .license-manager-filters,
+  .export-panel,
+  .license-table-container {
+    padding: var(--space-lg) !important;
+    margin: var(--space-lg) 0 !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .search-filter-panel h3,
+  .license-manager-filters h3,
+  .export-panel h3 {
+    font-size: 16px !important;
+    margin-bottom: var(--space-lg) !important;
+  }
+
+  /* Export Panel Mobile */
+  .export-panel .export-buttons,
+  .export-panel .form-actions {
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+
+  .export-panel .btn,
+  .export-panel .btn-export {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+
   /* Statistics Grid - Single Column */
   .license-stats-grid {
     grid-template-columns: 1fr !important;
@@ -1850,13 +2331,19 @@ label[for="is_group_product"]:hover {
   }
 
   .filter-actions {
-    flex-direction: row !important;
+    flex-direction: column !important;
     gap: 12px !important;
   }
 
   .filter-actions .btn {
-    width: auto !important;
-    flex: 1 !important;
+    width: 100% !important;
+    min-height: 44px !important;
+  }
+
+  .filter-input,
+  .filter-select {
+    min-height: 44px !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
   }
 
   .license-stats-grid {
@@ -1932,7 +2419,7 @@ label[for="is_group_product"]:hover {
   .select2-container--default
     .select2-selection--multiple
     .select2-selection__choice {
-    width: 310px !important;
+    width: 265px !important;
   }
 }
 
