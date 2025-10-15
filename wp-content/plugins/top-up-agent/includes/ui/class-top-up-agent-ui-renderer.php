@@ -34,35 +34,35 @@ class Top_Up_Agent_UI_Renderer {
 <!-- Modern Statistics Dashboard -->
 <div class="license-stats-grid">
     <div class="stat-card stat-total">
-        <div class="stat-icon">📊</div>
+        <div class="stat-icon"></div>
         <div class="stat-content">
             <div class="stat-number"><?php echo number_format($stats['total'] ?? 0); ?></div>
             <div class="stat-label">Total Keys</div>
         </div>
     </div>
     <div class="stat-card stat-available">
-        <div class="stat-icon">✅</div>
+        <div class="stat-icon"></div>
         <div class="stat-content">
             <div class="stat-number"><?php echo number_format($stats['unused'] ?? 0); ?></div>
             <div class="stat-label">Available</div>
         </div>
     </div>
     <div class="stat-card stat-used">
-        <div class="stat-icon">❌</div>
+        <div class="stat-icon"></div>
         <div class="stat-content">
             <div class="stat-number"><?php echo number_format($stats['used'] ?? 0); ?></div>
             <div class="stat-label">Used</div>
         </div>
     </div>
     <div class="stat-card stat-group">
-        <div class="stat-icon">📦</div>
+        <div class="stat-icon"></div>
         <div class="stat-content">
             <div class="stat-number"><?php echo number_format($stats['group_products'] ?? 0); ?></div>
             <div class="stat-label">Group Keys</div>
         </div>
     </div>
     <div class="stat-card stat-recent">
-        <div class="stat-icon">🕒</div>
+        <div class="stat-icon"></div>
         <div class="stat-content">
             <div class="stat-number"><?php echo number_format($stats['recent_additions'] ?? 0); ?></div>
             <div class="stat-label">Added This Week</div>
