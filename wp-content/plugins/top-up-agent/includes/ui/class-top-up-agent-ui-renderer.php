@@ -162,7 +162,7 @@ class Top_Up_Agent_UI_Renderer {
 <?php if (!empty($groups)): ?>
 <div class="license-table-container">
     <div class="table-header">
-        <h3>📦 Group License Keys</h3>
+        <h3 data-type="group">Group License Keys</h3>
         <span class="results-info">Showing <?php echo count($groups); ?> group(s)</span>
     </div>
 
@@ -190,8 +190,8 @@ class Top_Up_Agent_UI_Renderer {
                     </td>
                     <td>
                         <div class="status-indicators">
-                            <span class="status-available">✅ <?php echo $group->unused_count; ?></span>
-                            <span class="status-used">❌ <?php echo $group->used_count; ?></span>
+                            <span class="status-available"><?php echo $group->unused_count; ?></span>
+                            <span class="status-used"><?php echo $group->used_count; ?></span>
                         </div>
                     </td>
                     <td>
@@ -213,13 +213,13 @@ class Top_Up_Agent_UI_Renderer {
                     <td>
                         <div class="action-buttons">
                             <a href="?page=top-up-agent-license-keys&edit_group=<?php echo $group->group_id; ?>"
-                                class="btn btn-edit" title="Edit Group">✏️ Edit</a>
+                                class="btn btn-edit" title="Edit Group">Edit</a>
                             <form method="post" style="display: inline;"
                                 onsubmit="return confirm('Are you sure you want to delete this entire group?');">
                                 <?php wp_nonce_field('delete_group_keys'); ?>
                                 <input type="hidden" name="group_id" value="<?php echo $group->group_id; ?>">
                                 <button type="submit" name="delete_group_keys" class="btn btn-delete"
-                                    title="Delete Group">🗑️</button>
+                                    title="Delete Group"></button>
                             </form>
                         </div>
                     </td>
@@ -234,7 +234,7 @@ class Top_Up_Agent_UI_Renderer {
 <!-- Individual License Keys Table -->
 <div class="license-table-container">
     <div class="table-header">
-        <h3>� Individual License Keys (<?php echo number_format($total_keys); ?> total)</h3>
+        <h3>Individual License Keys (<?php echo number_format($total_keys); ?> total)</h3>
     </div>
 
     <?php if (!empty($license_keys)): ?>
@@ -260,7 +260,7 @@ class Top_Up_Agent_UI_Renderer {
                             <code><?php echo esc_html($key->license_key); ?></code>
                             <button class="copy-btn"
                                 onclick="copyToClipboard('<?php echo esc_js($key->license_key); ?>')"
-                                title="Copy to clipboard">📋</button>
+                                title="Copy to clipboard"></button>
                         </div>
                     </td>
                     <td class="col-products">
@@ -280,38 +280,38 @@ class Top_Up_Agent_UI_Renderer {
                     <td class="col-type">
                         <?php 
                                     if (isset($key->is_group_product) && $key->is_group_product) {
-                                        echo '<span class="type-badge type-group">📦 GROUP<br><small>(' . (isset($key->group_license_count) ? $key->group_license_count : 3) . ' keys)</small></span>';
+                                        echo '<span class="type-badge type-group">GROUP<br><small>(' . (isset($key->group_license_count) ? $key->group_license_count : 3) . ' keys)</small></span>';
                                     } else {
-                                        echo '<span class="type-badge type-single">📄 Single</span>';
+                                        echo '<span class="type-badge type-single">Single</span>';
                                     }
                                     ?>
                     </td>
                     <td class="col-status">
                         <?php if ($key->status === 'unused'): ?>
-                        <span class="status-badge status-available">✅ Available</span>
+                        <span class="status-badge status-available">Available</span>
                         <?php else: ?>
-                        <span class="status-badge status-used">❌ Used</span>
+                        <span class="status-badge status-used">Used</span>
                         <?php endif; ?>
                     </td>
                     <td class="col-dates">
                         <div class="dates-info">
-                            <div class="created-date">📅 <?php echo date('M j, Y', strtotime($key->created_date)); ?>
+                            <div class="created-date"><?php echo date('M j, Y', strtotime($key->created_date)); ?>
                             </div>
-                            <?php if ($key->used_date): ?>
-                            <div class="used-date">🕒 <?php echo date('M j, Y', strtotime($key->used_date)); ?></div>
+                            <?php if (!empty($key->used_date)): ?>
+                            <div class="used-date"><?php echo date('M j, Y', strtotime($key->used_date)); ?></div>
                             <?php endif; ?>
                         </div>
                     </td>
                     <td class="col-actions">
                         <div class="action-buttons">
                             <a href="<?php echo admin_url('admin.php?page=top-up-agent-license-keys&edit=' . $key->id); ?>"
-                                class="btn btn-edit" title="Edit">✏️</a>
+                                class="btn btn-edit" title="Edit"></a>
                             <form method="post" style="display: inline;"
                                 onsubmit="return confirm('Are you sure you want to delete this license key?')">
                                 <?php wp_nonce_field('delete_license_key'); ?>
                                 <input type="hidden" name="key_id" value="<?php echo $key->id; ?>">
                                 <button type="submit" name="delete_license_key" class="btn btn-delete"
-                                    title="Delete">🗑️</button>
+                                    title="Delete"></button>
                             </form>
                         </div>
                     </td>
