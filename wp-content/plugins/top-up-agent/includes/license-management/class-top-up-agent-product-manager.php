@@ -82,8 +82,12 @@ class Top_Up_Agent_Product_Manager {
     }
 
     public function render_product_options($selected_products = [], $element_id = 'selected_products') {
+        // Determine if this is for automation settings (multiple selection) or regular forms (single selection)
+        $is_automation = ($element_id === 'automation_enabled_products');
+        $class = $is_automation ? 'modern-select' : 'single-select';
+        $name = $is_automation ? 'automation_enabled_products[]' : 'selected_products';
         ?>
-        <select name="selected_products" id="<?php echo $element_id; ?>" class="modern-select">
+        <select name="<?php echo $name; ?>" id="<?php echo $element_id; ?>" class="<?php echo $class; ?>">
             <option value="">Select a product (or leave empty for all products)</option>
             <?php foreach ($this->products as $product): ?>
                 <?php $display_name = $this->clean_product_name($product['name']); ?>
@@ -100,7 +104,7 @@ class Top_Up_Agent_Product_Manager {
 
     public function render_bulk_product_options($selected_products = []) {
         ?>
-        <select name="bulk_selected_products" id="bulk_selected_products" class="modern-select">
+        <select name="bulk_selected_products" id="bulk_selected_products" class="single-select">
             <option value="">Select a product (or leave empty for all products)</option>
             <?php foreach ($this->products as $product): ?>
                 <?php $display_name = $this->clean_product_name($product['name']); ?>

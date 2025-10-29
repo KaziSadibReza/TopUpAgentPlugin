@@ -27,8 +27,8 @@
    * Initialize Select2 dropdowns
    */
   function initializeSelect2() {
-    // Initialize Select2 for product selectors with enhanced formatting (single selection)
-    $("#selected_products, #edit_selected_products, .modern-select").select2({
+    // Initialize Select2 for single product selection forms (Add New License Key, Edit License Key)
+    $("#selected_products, #edit_selected_products, .single-select").select2({
       placeholder: "Select a product...",
       allowClear: true,
       width: "100%",
@@ -47,6 +47,31 @@
         if (!data.id) return data.text;
 
         // Return full text for CSS handling
+        return data.text || data.label || "Unknown";
+      },
+      escapeMarkup: function (markup) {
+        return markup;
+      },
+    });
+
+    // Initialize Select2 for Automation Settings (multiple selection)
+    $("#automation_enabled_products, .modern-select").select2({
+      placeholder: "Select products for automation...",
+      allowClear: true,
+      width: "100%",
+      multiple: true,
+      templateResult: function (data) {
+        if (!data.id) return data.text;
+
+        var $result = $("<span></span>");
+        $result.text(data.text || data.label || "Unknown");
+        $result.attr("title", data.text || data.label || "Unknown");
+
+        return $result;
+      },
+      templateSelection: function (data) {
+        if (!data.id) return data.text;
+
         return data.text || data.label || "Unknown";
       },
       escapeMarkup: function (markup) {
@@ -84,32 +109,6 @@
         return markup;
       },
     });
-
-    // Specific initialization for bulk product selector
-    if ($("#bulk_selected_products").length > 0) {
-      console.log("Initializing bulk product selector");
-      $("#bulk_selected_products").select2({
-        placeholder: "Select one product for bulk import...",
-        allowClear: true,
-        width: "100%",
-        multiple: false,
-        templateResult: function (data) {
-          if (!data.id) return data.text;
-          var $result = $("<span></span>");
-          $result.text(data.text || "Unknown");
-          $result.attr("title", data.text || "Unknown");
-          return $result;
-        },
-        templateSelection: function (data) {
-          return data.text || "Unknown";
-        },
-      });
-
-      // Debug: Log when selection changes
-      $("#bulk_selected_products").on("change", function () {
-        console.log("Bulk products changed:", $(this).val());
-      });
-    }
   }
 
   /**
@@ -204,15 +203,14 @@
       var selectedData = selectedProducts.select2("data");
       var previewText = topUpAgentLicense.strings.selectProducts;
 
+      // For single selection, selectedData is still an array but with max 1 item
       if (selectedData && selectedData.length === 0) {
         previewText = topUpAgentLicense.strings.allProductsSet;
       } else if (selectedData && selectedData.length === 1) {
-        // Simple direct access like the old working code
+        // Simple direct access for single product
         var productText =
           selectedData[0].text || selectedData[0].label || "Unknown Product";
         previewText = productText + " Set 1";
-      } else if (selectedData && selectedData.length > 1) {
-        previewText = topUpAgentLicense.strings.mixedProductsSet;
       }
 
       groupNamePreview.text(previewText);
@@ -238,15 +236,14 @@
       var selectedData = selectedProducts.select2("data");
       var previewText = topUpAgentLicense.strings.selectProducts;
 
+      // For single selection, selectedData is still an array but with max 1 item
       if (selectedData && selectedData.length === 0) {
         previewText = topUpAgentLicense.strings.bulkAllProductsSet;
       } else if (selectedData && selectedData.length === 1) {
-        // Simple direct access like the old working code
+        // Simple direct access for single product
         var productText =
           selectedData[0].text || selectedData[0].label || "Unknown Product";
         previewText = productText + " Set 1, Set 2, Set 3...";
-      } else if (selectedData && selectedData.length > 1) {
-        previewText = topUpAgentLicense.strings.bulkMixedProductsSet;
       }
 
       groupNamePreview.text(previewText);
