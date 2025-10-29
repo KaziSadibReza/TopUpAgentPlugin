@@ -376,10 +376,10 @@ class Top_Up_Agent_UI_Renderer {
             </div>
 
             <div class="form-group full-width">
-                <label for="edit_selected_products">Assigned Products</label>
+                <label for="edit_selected_products">Assigned Product</label>
                 <?php $this->product_manager->render_product_options($edit_key_products, 'edit_selected_products'); ?>
-                <p class="form-help">Select products that this license key can be used for. Leave empty for all
-                    products.</p>
+                <p class="form-help">Select one specific product for this license key, or leave empty to make it
+                    available for all products.</p>
             </div>
         </div>
 
@@ -409,10 +409,10 @@ class Top_Up_Agent_UI_Renderer {
             </div>
 
             <div class="form-group">
-                <label for="selected_products">Assign to Products</label>
+                <label for="selected_products">Assign to Product</label>
                 <?php $this->product_manager->render_product_options([], 'selected_products'); ?>
-                <p class="form-help">Select products that this license key can be used for. Leave empty for all
-                    products.</p>
+                <p class="form-help">Select one specific product for this license key, or leave empty to make it
+                    available for all products.</p>
             </div>
 
             <div class="form-group full-width">
@@ -571,10 +571,10 @@ class Top_Up_Agent_UI_Renderer {
             </div>
 
             <div class="form-group">
-                <label for="bulk_selected_products">Assign to Products</label>
+                <label for="bulk_selected_products">Assign to Product</label>
                 <?php $this->product_manager->render_bulk_product_options(); ?>
-                <p class="form-help">Select products that these license keys can be used for. Leave empty for all
-                    products.</p>
+                <p class="form-help">Select one specific product for these license keys, or leave empty to make them
+                    available for all products.</p>
             </div>
 
             <div class="form-group">

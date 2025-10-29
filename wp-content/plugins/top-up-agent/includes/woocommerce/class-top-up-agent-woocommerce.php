@@ -6,7 +6,6 @@
 class Top_Up_Agent_WooCommerce_Integration {
     private $api;
     private $license_manager;
-    private $automation_db;
     
     // Custom order statuses for automation
     const STATUS_AUTOMATION_PENDING = 'automation-pending';
@@ -17,7 +16,6 @@ class Top_Up_Agent_WooCommerce_Integration {
     public function __construct() {
         require_once plugin_dir_path(__FILE__) . '../automation/class-top-up-agent-player-id-detector.php';
         require_once plugin_dir_path(__FILE__) . '../automation/class-top-up-agent-product-eligibility-checker.php';
-        require_once plugin_dir_path(__FILE__) . '../automation/class-top-up-agent-automation-database-manager.php';
         require_once plugin_dir_path(__FILE__) . '../license-management/class-top-up-agent-license-key-manager.php';
         require_once plugin_dir_path(__FILE__) . 'class-top-up-agent-woocommerce-template-helper.php';
         
@@ -28,7 +26,6 @@ class Top_Up_Agent_WooCommerce_Integration {
         error_log("Top Up Agent: Using new API integration system");
         
         $this->license_manager = new Top_Up_Agent_License_Key_Manager();
-        $this->automation_db = new Top_Up_Agent_Automation_Database_Manager();
         
         $this->init_hooks();
         $this->register_custom_order_statuses();
@@ -50,14 +47,24 @@ class Top_Up_Agent_WooCommerce_Integration {
         add_filter('manage_edit-shop_order_columns', array($this, 'add_automation_column'));
         add_action('manage_shop_order_posts_custom_column', array($this, 'display_automation_status'), 10, 2);
         
+        // Add automation status filters to orders list
+        add_action('restrict_manage_posts', array($this, 'add_automation_status_filter'));
+        add_filter('parse_query', array($this, 'filter_orders_by_automation_status'));
+        
         // Add automation actions to order page
         add_action('woocommerce_order_actions', array($this, 'add_order_actions'));
         add_action('woocommerce_order_action_retry_automation', array($this, 'retry_automation'));
         add_action('woocommerce_order_action_cancel_automation', array($this, 'cancel_automation'));
+        add_action('woocommerce_order_action_complete_automation_order', array($this, 'manual_complete_automation_order'));
         
         // Add automation details to order admin page
         add_action('woocommerce_admin_order_data_after_order_details', array($this, 'add_automation_order_details'));
         add_action('add_meta_boxes', array($this, 'add_automation_admin_controls'));
+        
+        // Add automation completion indicator and auto-complete orders
+        add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
+        add_action('woocommerce_order_status_changed', array($this, 'auto_complete_automation_orders'), 10, 4);
+        add_action('top_up_agent_automation_completed', array($this, 'handle_automation_completion'), 10, 2);
         
         // AJAX handlers for automation controls
         add_action('wp_ajax_top_up_agent_trigger_automation', array($this, 'ajax_trigger_automation'));
@@ -67,6 +74,9 @@ class Top_Up_Agent_WooCommerce_Integration {
         // AJAX handler for checking order queue status
         add_action('wp_ajax_check_order_queue_status', array($this, 'ajax_check_order_queue_status'));
         add_action('wp_ajax_nopriv_check_order_queue_status', array($this, 'ajax_check_order_queue_status'));
+        
+        // Register delayed order completion handler
+        add_action('top_up_agent_delayed_order_completion', array($this, 'delayed_order_completion'));
         
         // AJAX handler for triggering automation from WooCommerce page
         add_action('wp_ajax_trigger_order_automation', array($this, 'ajax_trigger_order_automation'));
@@ -963,11 +973,15 @@ class Top_Up_Agent_WooCommerce_Integration {
                     "✅ Automation completed successfully");
                 update_post_meta($order_id, '_automation_status', 'completed');
                 update_post_meta($order_id, '_automation_completed_at', current_time('mysql'));
+                update_post_meta($order_id, '_automation_completed', 'yes');
                 
                 // Store any result data
                 if (!empty($queue_status['result'])) {
                     update_post_meta($order_id, '_automation_result', $queue_status['result']);
                 }
+                
+                // Trigger auto-completion check
+                do_action('top_up_agent_automation_completed', $order_id, $queue_status);
                 break;
 
             case 'failed':
@@ -1795,6 +1809,64 @@ jQuery(document).ready(function($) {
     }
 
     /**
+     * Add automation status filter dropdown to orders list
+     */
+    public function add_automation_status_filter() {
+        global $typenow;
+        
+        if ($typenow === 'shop_order') {
+            $current_filter = isset($_GET['automation_status_filter']) ? $_GET['automation_status_filter'] : '';
+            
+            echo '<select name="automation_status_filter" id="automation_status_filter">';
+            echo '<option value="">All Automation Status</option>';
+            echo '<option value="none"' . selected($current_filter, 'none', false) . '>No Automation</option>';
+            echo '<option value="pending"' . selected($current_filter, 'pending', false) . '>⏳ Pending</option>';
+            echo '<option value="processing"' . selected($current_filter, 'processing', false) . '>🔄 Processing</option>';
+            echo '<option value="completed"' . selected($current_filter, 'completed', false) . '>✅ Completed</option>';
+            echo '<option value="failed"' . selected($current_filter, 'failed', false) . '>❌ Failed</option>';
+            echo '</select>';
+        }
+    }
+
+    /**
+     * Filter orders based on automation status
+     */
+    public function filter_orders_by_automation_status($query) {
+        global $pagenow, $typenow;
+        
+        if ($pagenow === 'edit.php' && $typenow === 'shop_order' && isset($_GET['automation_status_filter']) && $_GET['automation_status_filter'] !== '') {
+            $filter_value = sanitize_text_field($_GET['automation_status_filter']);
+            
+            if ($filter_value === 'none') {
+                // Show orders with no automation
+                $meta_query = array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_automation_status',
+                        'compare' => 'NOT EXISTS'
+                    ),
+                    array(
+                        'key' => '_automation_status',
+                        'value' => '',
+                        'compare' => '='
+                    )
+                );
+            } else {
+                // Show orders with specific automation status
+                $meta_query = array(
+                    array(
+                        'key' => '_automation_status',
+                        'value' => $filter_value,
+                        'compare' => '='
+                    )
+                );
+            }
+            
+            $query->set('meta_query', $meta_query);
+        }
+    }
+
+    /**
      * Add automation actions to order actions dropdown
      */
     public function add_order_actions($actions) {
@@ -1812,6 +1884,11 @@ jQuery(document).ready(function($) {
         
         if (in_array($automation_status, ['pending', 'processing'])) {
             $actions['cancel_automation'] = __('❌ Cancel Automation', 'top-up-agent');
+        }
+        
+        // Add manual completion action for automation-completed orders
+        if ($automation_status === 'completed' && $post->post_status === 'wc-automation-completed') {
+            $actions['complete_automation_order'] = __('🎮 Complete Order', 'top-up-agent');
         }
         
         return $actions;
@@ -1868,6 +1945,34 @@ jQuery(document).ready(function($) {
         
         // Redirect back with success message
         wp_redirect(add_query_arg('message', 'automation_cancelled', wp_get_referer()));
+        exit;
+    }
+
+    /**
+     * Handle manual completion of automation orders
+     */
+    public function manual_complete_automation_order($order) {
+        $order_id = $order->get_id();
+        
+        // Set the automation completed flag if not already set
+        update_post_meta($order_id, '_automation_completed', 'yes');
+        
+        // Complete the order
+        $order->update_status('completed', 
+            '🎮 Order manually completed after successful automation');
+        
+        // Add order note
+        $order->add_order_note(
+            'Top-Up Agent: Order manually completed by admin after automation success.',
+            false,
+            true
+        );
+        
+        // Log the completion
+        error_log("Top Up Agent: Order #{$order_id} manually completed by admin");
+        
+        // Redirect back with success message
+        wp_redirect(add_query_arg('message', 'automation_order_completed', wp_get_referer()));
         exit;
     }
 
@@ -2228,5 +2333,112 @@ jQuery(document).ready(function($) {
             'info' => $info,
             'can_trigger' => $can_trigger && !$automation_already_handled
         ];
+    }
+
+    /**
+     * Add automation completion indicator to order actions
+     * 
+     * @param int $order_id
+     */
+    public function add_automation_completion_indicator($order_id) {
+        $automation_completed = get_post_meta($order_id, '_automation_completed', true);
+        
+        if ($automation_completed === 'yes') {
+            echo '<div class="top-up-agent-completion-indicator" style="
+                background: linear-gradient(135deg, var(--wp-admin-theme-color, #2271b1) 0%, #135e96 100%);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                margin: 8px 0;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            ">
+                <span style="font-size: 14px;">🎮</span>
+                <span>Top-Up Automation Completed</span>
+            </div>';
+        }
+    }
+
+    /**
+     * Handle delayed order completion
+     * 
+     * @param int $order_id
+     */
+    public function delayed_order_completion($order_id) {
+        $order = wc_get_order($order_id);
+        
+        if (!$order) {
+            return;
+        }
+        
+        // Double-check automation is still completed
+        $automation_completed = get_post_meta($order_id, '_automation_completed', true);
+        
+        if ($automation_completed === 'yes' && $order->get_status() !== 'completed') {
+            $order->update_status('completed', 
+                '🎮 Order automatically completed after successful automation (delayed processing)');
+            
+            error_log("Top Up Agent: Order #{$order_id} completed via delayed processing");
+        }
+    }
+
+    /**
+     * Handle automation completion and potentially auto-complete order
+     * 
+     * @param int $order_id
+     * @param array $queue_status
+     */
+    public function handle_automation_completion($order_id, $queue_status) {
+        $order = wc_get_order($order_id);
+        
+        if (!$order) {
+            return;
+        }
+        
+        // Check if order should be auto-completed (could be a setting in the future)
+        $auto_complete_enabled = apply_filters('top_up_agent_auto_complete_orders', true);
+        
+        if ($auto_complete_enabled && $order->get_status() === str_replace('wc-', '', self::STATUS_AUTOMATION_COMPLETED)) {
+            // Delay the completion slightly to ensure all hooks are processed
+            wp_schedule_single_event(time() + 2, 'top_up_agent_delayed_order_completion', array($order_id));
+        }
+    }
+
+    /**
+     * Automatically complete orders when automation is finished
+     * 
+     * @param int $order_id
+     * @param string $from_status
+     * @param string $to_status
+     * @param WC_Order $order
+     */
+    public function auto_complete_automation_orders($order_id, $from_status, $to_status, $order) {
+        // Only process if order status changed to automation-completed
+        if ($to_status !== self::STATUS_AUTOMATION_COMPLETED) {
+            return;
+        }
+
+        // Check if automation is marked as completed
+        $automation_completed = get_post_meta($order_id, '_automation_completed', true);
+        
+        if ($automation_completed === 'yes') {
+            // Change order status to completed
+            $order->update_status('completed', 
+                '🎮 Order automatically completed after successful automation');
+            
+            // Add order note for transparency
+            $order->add_order_note(
+                'Top-Up Agent: Order automatically marked as completed following successful automation completion.',
+                false, // not customer note
+                true   // added by system
+            );
+            
+            // Log the auto-completion
+            error_log("Top Up Agent: Order #{$order_id} automatically completed after automation success");
+        }
     }
 }

@@ -45,6 +45,30 @@
   width: 120px;
 }
 
+/* Automation Status Filter Dropdown */
+#automation_status_filter {
+  margin-left: 10px;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+  min-width: 160px;
+}
+
+#automation_status_filter:focus {
+  border-color: var(--wp-admin-theme-color, #2271b1);
+  box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #2271b1);
+  outline: none;
+}
+
+/* Automation Status Column Styling */
+.column-automation_status span {
+  font-weight: 500;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 /* Automation Diagnosis Styles */
 .automation-diagnosis {
   background: #fff3cd;
@@ -280,4 +304,75 @@
   .automation-progress {
     background-color: #34495e;
   }
+}
+
+/* WooCommerce Admin Order Enhancement Styles */
+.top-up-agent-completion-indicator {
+  background: linear-gradient(
+    135deg,
+    var(--wp-admin-theme-color, #2271b1) 0%,
+    #135e96 100%
+  ) !important;
+  color: white !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  margin: 8px 0 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  animation: completion-fade-in 0.5s ease-in-out;
+}
+
+@keyframes completion-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced Order Actions Section */
+.woocommerce_page_wc-orders .top-up-agent-completion-indicator,
+.post-type-shop_order .top-up-agent-completion-indicator {
+  margin-bottom: 12px;
+}
+
+/* WooCommerce Order Status Badge Enhancement */
+.order-status.status-automation-completed {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  color: white;
+  border: none;
+  font-weight: 600;
+}
+
+.order-status.status-automation-completed:before {
+  content: "🎮 ";
+  margin-right: 4px;
+}
+
+/* Order Meta Box Enhancements */
+.top-up-agent-automation-details h3 {
+  color: var(--wp-admin-theme-color, #2271b1);
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.top-up-agent-automation-details p {
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.top-up-agent-automation-details .automation-meta {
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 4px;
+  margin: 8px 0;
 }

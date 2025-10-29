@@ -79,7 +79,6 @@ require_once plugin_dir_path(__FILE__) . 'includes/api-integration/class-top-up-
 
 // Load automation classes
 require_once plugin_dir_path(__FILE__) . 'includes/automation/class-top-up-agent-automation-manager.php';
-require_once plugin_dir_path(__FILE__) . 'includes/automation/class-top-up-agent-automation-database-manager.php';
 require_once plugin_dir_path(__FILE__) . 'includes/automation/class-top-up-agent-player-id-detector.php';
 require_once plugin_dir_path(__FILE__) . 'includes/automation/class-top-up-agent-product-eligibility-checker.php';
 

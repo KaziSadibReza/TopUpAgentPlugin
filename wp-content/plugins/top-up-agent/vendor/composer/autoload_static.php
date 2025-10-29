@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit045658d81f6d9d3243e731dda7bf04d1
+class ComposerStaticInit2f2a0f55c4836b32cbb09d5dab04e0a8
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
@@ -26,7 +26,6 @@ class ComposerStaticInit045658d81f6d9d3243e731dda7bf04d1
         'Top_Up_Agent_API_Client' => __DIR__ . '/../..' . '/includes/api-integration/class-api-client.php',
         'Top_Up_Agent_Admin' => __DIR__ . '/../..' . '/includes/core/class-top-up-agent-admin.php',
         'Top_Up_Agent_Asset_Handler' => __DIR__ . '/../..' . '/includes/core/class-top-up-agent-asset-handler.php',
-        'Top_Up_Agent_Automation_Database_Manager' => __DIR__ . '/../..' . '/includes/automation/class-top-up-agent-automation-database-manager.php',
         'Top_Up_Agent_Automation_Manager' => __DIR__ . '/../..' . '/includes/automation/class-top-up-agent-automation-manager.php',
         'Top_Up_Agent_Form_Handler' => __DIR__ . '/../..' . '/includes/ui/class-top-up-agent-form-handler.php',
         'Top_Up_Agent_License_Key_Manager' => __DIR__ . '/../..' . '/includes/license-management/class-top-up-agent-license-key-manager.php',
@@ -44,9 +43,9 @@ class ComposerStaticInit045658d81f6d9d3243e731dda7bf04d1
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit045658d81f6d9d3243e731dda7bf04d1::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit045658d81f6d9d3243e731dda7bf04d1::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit045658d81f6d9d3243e731dda7bf04d1::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit2f2a0f55c4836b32cbb09d5dab04e0a8::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit2f2a0f55c4836b32cbb09d5dab04e0a8::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit2f2a0f55c4836b32cbb09d5dab04e0a8::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -83,7 +83,8 @@ class Top_Up_Agent_Product_Manager {
 
     public function render_product_options($selected_products = [], $element_id = 'selected_products') {
         ?>
-        <select name="selected_products[]" id="<?php echo $element_id; ?>" multiple class="modern-select">
+        <select name="selected_products" id="<?php echo $element_id; ?>" class="modern-select">
+            <option value="">Select a product (or leave empty for all products)</option>
             <?php foreach ($this->products as $product): ?>
                 <?php $display_name = $this->clean_product_name($product['name']); ?>
                 <option value="<?php echo $product['id']; ?>" <?php echo in_array($product['id'], $selected_products) ? 'selected' : ''; ?>>
@@ -99,7 +100,8 @@ class Top_Up_Agent_Product_Manager {
 
     public function render_bulk_product_options($selected_products = []) {
         ?>
-        <select name="bulk_selected_products[]" id="bulk_selected_products" multiple class="modern-select">
+        <select name="bulk_selected_products" id="bulk_selected_products" class="modern-select">
+            <option value="">Select a product (or leave empty for all products)</option>
             <?php foreach ($this->products as $product): ?>
                 <?php $display_name = $this->clean_product_name($product['name']); ?>
                 <option value="<?php echo $product['id']; ?>" <?php echo in_array($product['id'], $selected_products) ? 'selected' : ''; ?>>

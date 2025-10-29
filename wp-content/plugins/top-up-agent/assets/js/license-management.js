@@ -27,13 +27,12 @@
    * Initialize Select2 dropdowns
    */
   function initializeSelect2() {
-    // Initialize Select2 for product selectors with enhanced formatting
-    $(
-      "#selected_products, #edit_selected_products, #bulk_selected_products, .modern-select"
-    ).select2({
-      placeholder: "Select products...",
+    // Initialize Select2 for product selectors with enhanced formatting (single selection)
+    $("#selected_products, #edit_selected_products, .modern-select").select2({
+      placeholder: "Select a product...",
       allowClear: true,
       width: "100%",
+      multiple: false,
       templateResult: function (data) {
         if (!data.id) return data.text;
 
@@ -85,6 +84,32 @@
         return markup;
       },
     });
+
+    // Specific initialization for bulk product selector
+    if ($("#bulk_selected_products").length > 0) {
+      console.log("Initializing bulk product selector");
+      $("#bulk_selected_products").select2({
+        placeholder: "Select one product for bulk import...",
+        allowClear: true,
+        width: "100%",
+        multiple: false,
+        templateResult: function (data) {
+          if (!data.id) return data.text;
+          var $result = $("<span></span>");
+          $result.text(data.text || "Unknown");
+          $result.attr("title", data.text || "Unknown");
+          return $result;
+        },
+        templateSelection: function (data) {
+          return data.text || "Unknown";
+        },
+      });
+
+      // Debug: Log when selection changes
+      $("#bulk_selected_products").on("change", function () {
+        console.log("Bulk products changed:", $(this).val());
+      });
+    }
   }
 
   /**
@@ -251,13 +276,31 @@
   function initializeFormValidation() {
     // Add form validation for license key format
     $("form.license-form").on("submit", function (e) {
+      var $form = $(this);
       var isValid = true;
       var errorMessages = [];
+
+      // Debug: Log bulk form data before submission
+      if ($form.find("#bulk_license_keys").length > 0) {
+        var bulkProducts = $("#bulk_selected_products").val();
+        console.log("Bulk form submission - Selected products:", bulkProducts);
+        console.log("Bulk form data:", $form.serialize());
+
+        // Ensure Select2 values are properly set
+        $("#bulk_selected_products").trigger("change.select2");
+      }
 
       // Validate single license key
       var singleKey = $("#license_key");
       if (singleKey.is(":visible") && singleKey.val().trim() === "") {
         errorMessages.push("License key is required.");
+        isValid = false;
+      }
+
+      // Validate bulk license keys
+      var bulkKeys = $("#bulk_license_keys");
+      if (bulkKeys.is(":visible") && bulkKeys.val().trim() === "") {
+        errorMessages.push("License keys are required for bulk import.");
         isValid = false;
       }
 
@@ -583,4 +626,25 @@
    * Global copy function for inline onclick handlers
    */
   window.copyToClipboard = copyToClipboard;
+
+  /**
+   * Debug function to test bulk form data
+   */
+  window.debugBulkForm = function () {
+    console.log("=== Bulk Form Debug ===");
+    console.log(
+      "Bulk products element exists:",
+      $("#bulk_selected_products").length > 0
+    );
+    console.log("Bulk products value:", $("#bulk_selected_products").val());
+    console.log(
+      "Bulk products Select2 data:",
+      $("#bulk_selected_products").select2("data")
+    );
+    console.log(
+      "Form serialize:",
+      $("form.license-form:has(#bulk_license_keys)").serialize()
+    );
+    console.log("======================");
+  };
 })(jQuery);

@@ -60,7 +60,17 @@ class Top_Up_Agent_License_Key_Manager {
     }
 
     public function add_license_key($license_key, $product_ids = [], $is_group_product = 0, $group_license_count = 3, $group_id = null, $group_name = null) {
-        $product_ids_string = empty($product_ids) ? null : implode(',', array_map('intval', $product_ids));
+        // Handle product_ids assignment logic:
+        // - null = available for ALL products  
+        // - empty array = not assigned to any specific products (use empty string)
+        // - array with values = available for specific products only
+        if ($product_ids === null) {
+            $product_ids_string = null; // Available for ALL products
+        } elseif (is_array($product_ids) && empty($product_ids)) {
+            $product_ids_string = ''; // Not assigned to any products
+        } else {
+            $product_ids_string = implode(',', array_map('intval', $product_ids));
+        }
         
         $result = $this->wpdb->insert($this->table_name, [
             'license_key' => sanitize_text_field($license_key),
@@ -264,7 +274,7 @@ class Top_Up_Agent_License_Key_Manager {
         }
         
         if (!empty($product_id)) {
-            $where_conditions[] = "(product_ids IS NULL OR FIND_IN_SET(%d, product_ids) > 0)";
+            $where_conditions[] = "(product_ids IS NULL OR (product_ids != '' AND FIND_IN_SET(%d, product_ids) > 0))";
             $where_values[] = intval($product_id);
         }
         
@@ -280,7 +290,7 @@ class Top_Up_Agent_License_Key_Manager {
         }
     }
     
-    public function get_license_keys_count($search = '', $status = '', $product_id = '') {
+    public function get_all_license_keys_count($search = '', $status = '', $product_id = '') {
         $where_conditions = ['(is_group_product = 0 OR is_group_product IS NULL OR group_id IS NULL)']; // Exclude group keys
         $where_values = [];
         
@@ -295,7 +305,7 @@ class Top_Up_Agent_License_Key_Manager {
         }
         
         if (!empty($product_id)) {
-            $where_conditions[] = "(product_ids IS NULL OR FIND_IN_SET(%d, product_ids) > 0)";
+            $where_conditions[] = "(product_ids IS NULL OR (product_ids != '' AND FIND_IN_SET(%d, product_ids) > 0))";
             $where_values[] = intval($product_id);
         }
         
@@ -307,6 +317,11 @@ class Top_Up_Agent_License_Key_Manager {
         } else {
             return $this->wpdb->get_var($query);
         }
+    }
+    
+    // Alias for backward compatibility
+    public function get_license_keys_count($search = '', $status = '', $product_id = '') {
+        return $this->get_all_license_keys_count($search, $status, $product_id);
     }
 
     public function bulk_import($license_keys_text, $product_ids = [], $is_group_product = 0, $group_license_count = 3) {
@@ -330,7 +345,7 @@ class Top_Up_Agent_License_Key_Manager {
 
     public function get_unused_license_key_count($product_id) {
         return $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(*) FROM {$this->table_name} WHERE status = 'unused' AND (product_ids IS NULL OR FIND_IN_SET(%d, product_ids) > 0)",
+            "SELECT COUNT(*) FROM {$this->table_name} WHERE status = 'unused' AND (product_ids IS NULL OR (product_ids != '' AND FIND_IN_SET(%d, product_ids) > 0))",
             $product_id
         ));
     }
@@ -416,7 +431,7 @@ class Top_Up_Agent_License_Key_Manager {
         $params = [];
         
         if ($product_id) {
-            $where_clause .= " AND (product_ids IS NULL OR FIND_IN_SET(%d, product_ids) > 0)";
+            $where_clause .= " AND (product_ids IS NULL OR (product_ids != '' AND FIND_IN_SET(%d, product_ids) > 0))";
             $params[] = intval($product_id);
         }
         
@@ -442,7 +457,7 @@ class Top_Up_Agent_License_Key_Manager {
         }
         
         if ($product_filter) {
-            $where_conditions[] = "(product_ids IS NULL OR FIND_IN_SET(%d, product_ids) > 0)";
+            $where_conditions[] = "(product_ids IS NULL OR (product_ids != '' AND FIND_IN_SET(%d, product_ids) > 0))";
             $params[] = intval($product_filter);
         }
         
@@ -510,7 +525,7 @@ class Top_Up_Agent_License_Key_Manager {
             "SELECT * FROM {$this->table_name} 
              WHERE status = 'unused' 
              AND is_group_product = 1
-             AND (product_ids IS NULL OR product_ids = '' OR FIND_IN_SET(%s, product_ids) > 0)
+             AND (product_ids IS NULL OR (product_ids != '' AND FIND_IN_SET(%s, product_ids) > 0))
              ORDER BY created_date ASC
              LIMIT 1",
             $product_id

@@ -11,7 +11,6 @@ return array(
     'Top_Up_Agent_API_Client' => $baseDir . '/includes/api-integration/class-api-client.php',
     'Top_Up_Agent_Admin' => $baseDir . '/includes/core/class-top-up-agent-admin.php',
     'Top_Up_Agent_Asset_Handler' => $baseDir . '/includes/core/class-top-up-agent-asset-handler.php',
-    'Top_Up_Agent_Automation_Database_Manager' => $baseDir . '/includes/automation/class-top-up-agent-automation-database-manager.php',
     'Top_Up_Agent_Automation_Manager' => $baseDir . '/includes/automation/class-top-up-agent-automation-manager.php',
     'Top_Up_Agent_Form_Handler' => $baseDir . '/includes/ui/class-top-up-agent-form-handler.php',
     'Top_Up_Agent_License_Key_Manager' => $baseDir . '/includes/license-management/class-top-up-agent-license-key-manager.php',

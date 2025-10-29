@@ -2,6 +2,7 @@
 class Top_Up_Agent_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'register_menus'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
         
         // Hide other plugin notifications on our plugin pages - multiple hooks for better coverage
         add_action('admin_init', array($this, 'hide_other_plugin_notifications'));
@@ -294,20 +295,38 @@ This email was sent automatically by TopUp Agent.
     }
     
     public function register_menus() {
-        add_menu_page('Top Up Agent Dashboard', 'Top Up Agent', 'manage_options', 'top-up-agent-dashboard', array($this, 'dashboard_page'), 'dashicons-admin-generic', 26);
+        $icon_url = plugin_dir_url(__FILE__) . '../../assets/images/plugin-icon.svg';
+        add_menu_page('Top Up Agent Dashboard', 'Top Up Agent', 'manage_options', 'top-up-agent-dashboard', array($this, 'dashboard_page'), $icon_url, 26);
         add_submenu_page('top-up-agent-dashboard', 'Dashboard', 'Dashboard', 'manage_options', 'top-up-agent-dashboard', array($this, 'dashboard_page'));
         // add_submenu_page('top-up-agent-dashboard', 'Automation', 'Automation', 'manage_options', 'top-up-agent-automation', array($this, 'automation_page'));
         add_submenu_page('top-up-agent-dashboard', 'WooCommerce', 'WooCommerce', 'manage_options', 'top-up-agent-woocommerce', array($this, 'woocommerce_page'));
         add_submenu_page('top-up-agent-dashboard', 'License Keys', 'License Keys', 'manage_options', 'top-up-agent-license-keys', array($this, 'license_keys_page'));
         add_submenu_page('top-up-agent-dashboard', 'Settings', 'Settings', 'manage_options', 'top-up-agent-settings', array($this, 'settings_page'));
     }
+
+    public function enqueue_admin_styles() {
+        // Add custom styles for the menu icon
+        wp_add_inline_style('admin-menu', '
+            #adminmenu #toplevel_page_top-up-agent-dashboard .wp-menu-image img {
+                width: 20px !important;
+                height: 20px !important;
+                opacity: 0.6;
+                filter: brightness(0) invert(1);
+            }
+            #adminmenu #toplevel_page_top-up-agent-dashboard:hover .wp-menu-image img,
+            #adminmenu #toplevel_page_top-up-agent-dashboard.wp-has-current-submenu .wp-menu-image img {
+                opacity: 1 !important;
+                filter: brightness(0) invert(1);
+            }
+            #adminmenu #toplevel_page_top-up-agent-dashboard.current .wp-menu-image img {
+                opacity: 1 !important;
+                filter: brightness(0) invert(1);
+            }
+        ');
+    }
     
     public function dashboard_page() {
         include plugin_dir_path(__FILE__) . '../../templates/dashboard.php';
-    }
-    
-    public function automation_page() {
-        include plugin_dir_path(__FILE__) . '../../templates/automation.php';
     }
     
     public function woocommerce_page() {

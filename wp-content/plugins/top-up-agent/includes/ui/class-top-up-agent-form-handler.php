@@ -131,7 +131,8 @@ class Top_Up_Agent_Form_Handler {
         // Handle add license key
         if (isset($_POST['add_license_key']) && check_admin_referer('add_license_key')) {
             $license_key = sanitize_text_field($_POST['license_key']);
-            $selected_products = isset($_POST['selected_products']) ? array_map('intval', $_POST['selected_products']) : [];
+            $selected_product = isset($_POST['selected_products']) && !empty($_POST['selected_products']) ? intval($_POST['selected_products']) : null;
+            $selected_products = $selected_product ? [$selected_product] : []; // Convert single product to array for compatibility
             $is_group_product = isset($_POST['is_group_product']) ? 1 : 0;
             $group_license_count = isset($_POST['group_license_count']) ? intval($_POST['group_license_count']) : 3;
             
@@ -177,7 +178,8 @@ class Top_Up_Agent_Form_Handler {
         if (isset($_POST['edit_license_key']) && check_admin_referer('edit_license_key')) {
             $key_id = intval($_POST['key_id']);
             $license_key = sanitize_text_field($_POST['license_key']);
-            $selected_products = isset($_POST['selected_products']) ? array_map('intval', $_POST['selected_products']) : [];
+            $selected_product = isset($_POST['selected_products']) && !empty($_POST['selected_products']) ? intval($_POST['selected_products']) : null;
+            $selected_products = $selected_product ? [$selected_product] : []; // Convert single product to array for compatibility
             $is_group_product = isset($_POST['is_group_product']) ? 1 : 0;
             $group_license_count = isset($_POST['group_license_count']) ? intval($_POST['group_license_count']) : 3;
             
@@ -257,9 +259,17 @@ class Top_Up_Agent_Form_Handler {
         // Handle bulk import
         if (isset($_POST['bulk_import']) && check_admin_referer('bulk_import_license_keys')) {
             $bulk_keys = sanitize_textarea_field($_POST['bulk_license_keys']);
-            $selected_products = isset($_POST['selected_products']) ? array_map('intval', $_POST['selected_products']) : [];
-            $is_group_product = isset($_POST['is_group_product']) ? 1 : 0;
-            $group_license_count = isset($_POST['group_license_count']) ? intval($_POST['group_license_count']) : 3;
+            $selected_product = isset($_POST['bulk_selected_products']) && !empty($_POST['bulk_selected_products']) ? intval($_POST['bulk_selected_products']) : null;
+            $selected_products = $selected_product ? [$selected_product] : []; // Convert single product to array for compatibility
+            $is_group_product = isset($_POST['bulk_is_group_product']) ? 1 : 0;
+            $group_license_count = isset($_POST['bulk_group_license_count']) ? intval($_POST['bulk_group_license_count']) : 3;
+            
+            // Debug logging
+            error_log("Top Up Agent Bulk Import Debug:");
+            error_log("- Selected product: " . ($selected_product ? $selected_product : 'none (all products)'));
+            error_log("- Selected products array: " . print_r($selected_products, true));
+            error_log("- Is group product: " . $is_group_product);
+            error_log("- Group license count: " . $group_license_count);
             
             if ($bulk_keys) {
                 $keys = array_filter(array_map('trim', explode("\n", $bulk_keys)));
