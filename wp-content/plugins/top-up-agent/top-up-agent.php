@@ -109,43 +109,13 @@ function top_up_agent_init_woocommerce() {
 		// Initialize WooCommerce integration
 		global $top_up_agent_woocommerce;
 		$top_up_agent_woocommerce = new Top_Up_Agent_WooCommerce_Integration();
-		
-		// Debug log
-		error_log('Top Up Agent: WooCommerce integration loaded successfully');
-	} else {
-		error_log('Top Up Agent: WooCommerce not detected - integration disabled');
 	}
 }
 
 // Ensure WooCommerce hooks are ready
 add_action('woocommerce_loaded', 'top_up_agent_woocommerce_ready', 10);
 function top_up_agent_woocommerce_ready() {
-	global $top_up_agent_woocommerce;
-	if ($top_up_agent_woocommerce && class_exists('Top_Up_Agent_WooCommerce_Integration')) {
-		error_log('Top Up Agent: WooCommerce hooks ready and integration active');
-		
-		// Test if our hooks are registered
-		$hook_priority = has_action('woocommerce_order_status_processing', array($top_up_agent_woocommerce, 'handle_processing_order'));
-		error_log('Top Up Agent: Processing hook registered with priority: ' . ($hook_priority !== false ? $hook_priority : 'NOT REGISTERED'));
-	}
-}
-
-// Add debug hook to test order status changes
-add_action('woocommerce_order_status_changed', 'top_up_agent_debug_status_change', 10, 4);
-function top_up_agent_debug_status_change($order_id, $old_status, $new_status, $order) {
-	error_log("Top Up Agent DEBUG: Order #$order_id status changed from '$old_status' to '$new_status'");
-	
-	if ($new_status === 'processing') {
-		error_log("Top Up Agent DEBUG: Order #$order_id reached PROCESSING status - automation should trigger");
-		
-		// Check if our hook will fire
-		global $top_up_agent_woocommerce;
-		if ($top_up_agent_woocommerce) {
-			error_log("Top Up Agent DEBUG: WooCommerce integration instance exists");
-		} else {
-			error_log("Top Up Agent DEBUG: WooCommerce integration instance NOT FOUND!");
-		}
-	}
+	// WooCommerce integration is ready
 }
 
 // Add AJAX handler for real-time logs

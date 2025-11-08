@@ -2730,8 +2730,6 @@ jQuery(document).ready(function($) {
      * @return array
      */
     public function add_custom_statuses_to_my_account($args) {
-        error_log('Top Up Agent: My Account Query Hook - Original args: ' . print_r($args, true));
-        
         // CRITICAL FIX: Remove status filter completely and use 'any' to get ALL orders
         // The status filter is preventing orders with custom statuses from showing
         $args['status'] = 'any';
@@ -2740,8 +2738,6 @@ jQuery(document).ready(function($) {
         if (isset($args['type'])) {
             unset($args['type']);
         }
-        
-        error_log('Top Up Agent: My Account Query Hook - Modified to use status=any');
         
         return $args;
     }
@@ -2787,8 +2783,6 @@ jQuery(document).ready(function($) {
     public function modify_orders_query_directly($query, $query_vars) {
         // Only modify if this is a customer query (has customer parameter)
         if (!empty($query_vars['customer'])) {
-            error_log('Top Up Agent: Data Store Query - Original query: ' . print_r($query, true));
-            
             // If status is being filtered, make sure our custom statuses are included
             if (isset($query['post_status'])) {
                 $custom_statuses = array(
@@ -2805,7 +2799,6 @@ jQuery(document).ready(function($) {
                 }
                 
                 $query['post_status'] = array_unique($query['post_status']);
-                error_log('Top Up Agent: Data Store Query - Modified post_status: ' . print_r($query['post_status'], true));
             }
         }
         
@@ -2822,8 +2815,6 @@ jQuery(document).ready(function($) {
     public function modify_my_account_orders_query($query) {
         // Only modify My Account order queries
         if (!is_admin() && $query->is_main_query() && is_account_page() && isset($query->query_vars['post_type']) && $query->query_vars['post_type'] === 'shop_order') {
-            error_log('Top Up Agent: Modifying My Account posts query');
-            
             $post_status = $query->get('post_status');
             
             // Add our custom statuses
@@ -2836,7 +2827,6 @@ jQuery(document).ready(function($) {
             }
             
             $query->set('post_status', array_unique($post_status));
-            error_log('Top Up Agent: Modified post_status to: ' . print_r($post_status, true));
         }
     }
 

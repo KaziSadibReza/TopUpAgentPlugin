@@ -186,15 +186,12 @@ class Top_Up_Agent_WebSocket_Integration {
         }
         
         // Temporarily bypass health check since we confirmed server is running
-        // TODO: Investigate why health_check() is failing despite healthy server
-        error_log('Top Up Agent: Bypassing health check - server confirmed running on port 3000');
         return true;
         
         // Quick server health check (commented out for debugging)
         /*
         $health_check = $this->api_client->health_check();
         if (is_wp_error($health_check)) {
-            error_log('Top Up Agent: Server not reachable, disabling WebSocket - ' . $health_check->get_error_message());
             return false;
         }
         

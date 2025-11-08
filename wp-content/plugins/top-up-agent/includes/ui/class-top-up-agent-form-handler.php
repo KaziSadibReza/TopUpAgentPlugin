@@ -51,32 +51,22 @@ class Top_Up_Agent_Form_Handler {
 
         // Handle automation settings update
         if (isset($_POST['update_automation_settings']) && check_admin_referer('update_automation_settings')) {
-            error_log('Top Up Agent: Automation settings update form submitted');
-            
             $enabled_products = isset($_POST['automation_enabled_products']) ? array_map('intval', $_POST['automation_enabled_products']) : [];
-            error_log('Top Up Agent: Selected products for automation: ' . implode(', ', $enabled_products));
             
             // Get current settings to compare
             $current_settings = get_option('top_up_agent_products_automation_enabled', []);
-            error_log('Top Up Agent: Current automation settings: ' . implode(', ', $current_settings));
             
             $result = $this->automation_manager->update_automation_settings($enabled_products);
-            error_log('Top Up Agent: Update automation settings result: ' . ($result ? 'success' : 'failed'));
             
             // Verify the settings were actually saved
             $new_settings = get_option('top_up_agent_products_automation_enabled', []);
-            error_log('Top Up Agent: New automation settings after save: ' . implode(', ', $new_settings));
             
             // Check if settings actually changed (update_option returns false if no change)
             $settings_changed = $current_settings !== $new_settings;
-            error_log('Top Up Agent: Settings actually changed: ' . ($settings_changed ? 'yes' : 'no'));
             
             // Consider it successful if settings match what we wanted to save OR if they actually changed
             $arrays_match = empty(array_diff($enabled_products, $new_settings)) && empty(array_diff($new_settings, $enabled_products));
             $success = $result || $arrays_match;
-            
-            error_log('Top Up Agent: Arrays match: ' . ($arrays_match ? 'yes' : 'no'));
-            error_log('Top Up Agent: Final success determination: ' . ($success ? 'success' : 'failed'));
             
             if ($success) {
                 $count = count($enabled_products);
