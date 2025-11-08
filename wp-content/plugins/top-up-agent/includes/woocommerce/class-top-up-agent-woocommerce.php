@@ -74,6 +74,9 @@ class Top_Up_Agent_WooCommerce_Integration {
         add_action('woocommerce_order_details_after_order_table', array($this, 'display_customer_automation_status'), 10, 1);
         add_action('woocommerce_thankyou', array($this, 'display_customer_automation_status_thankyou'), 10, 1);
         
+        // Make custom automation statuses visible in customer My Account orders
+        add_filter('woocommerce_my_account_my_orders_query', array($this, 'add_custom_statuses_to_my_account'), 10, 1);
+        
         // Add automation completion indicator and auto-complete orders
         add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
         add_action('woocommerce_order_status_changed', array($this, 'auto_complete_automation_orders'), 10, 4);
@@ -2703,6 +2706,39 @@ jQuery(document).ready(function($) {
 
         // Display the same status box
         $this->display_customer_automation_status($order);
+    }
+
+
+    /**
+     * Add custom automation statuses to customer My Account orders query
+     * This ensures customers can see their orders with automation statuses
+     * 
+     * @param array $args
+     * @return array
+     */
+    public function add_custom_statuses_to_my_account($args) {
+        // Get the default statuses WooCommerce shows to customers
+        $default_statuses = isset($args['status']) ? $args['status'] : array_keys(wc_get_order_statuses());
+        
+        // Add our custom automation statuses
+        $custom_statuses = array(
+            'automation-pending',
+            'automation-processing',
+            'automation-failed',
+            'automation-completed'
+        );
+        
+        // Merge default and custom statuses
+        if (is_array($default_statuses)) {
+            $args['status'] = array_merge($default_statuses, $custom_statuses);
+        } else {
+            $args['status'] = $custom_statuses;
+        }
+        
+        // Remove duplicates
+        $args['status'] = array_unique($args['status']);
+        
+        return $args;
     }
 
 }
