@@ -122,6 +122,7 @@ class Top_Up_Agent_Webhook_Handler {
                     ($execution_time ? " (took {$execution_time}ms)" : ""));
                 
                 // Store success details
+                update_post_meta($order_id, '_automation_completed', 'yes');
                 update_post_meta($order_id, '_automation_completed_at', current_time('mysql'));
                 update_post_meta($order_id, '_automation_result', $result);
                 update_post_meta($order_id, '_automation_execution_time', $execution_time);
