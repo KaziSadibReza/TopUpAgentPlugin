@@ -78,6 +78,7 @@ class Top_Up_Agent_WooCommerce_Integration {
         add_filter('woocommerce_my_account_my_orders_query', array($this, 'add_custom_statuses_to_my_account'), 10, 1);
         add_filter('woocommerce_order_is_paid_statuses', array($this, 'add_paid_statuses'), 10, 1);
         add_filter('wc_order_is_editable', array($this, 'make_automation_orders_non_editable'), 10, 2);
+        add_filter('woocommerce_valid_order_statuses_for_payment_complete', array($this, 'add_paid_statuses'), 10, 1);
         
         // Add automation completion indicator and auto-complete orders
         add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
@@ -2734,20 +2735,24 @@ jQuery(document).ready(function($) {
         // Debug logging
         error_log('Top Up Agent: My Account Query - Original args: ' . print_r($args, true));
         
-        // If status is set in args, merge with it
+        // IMPORTANT: Remove the status filter entirely and let WooCommerce find all orders for this customer
+        // Then we'll filter by checking the actual order status
         if (isset($args['status'])) {
+            // Keep existing statuses but add ours
             if (is_array($args['status'])) {
                 $args['status'] = array_merge($args['status'], $custom_statuses);
             } else {
                 $args['status'] = array_merge(array($args['status']), $custom_statuses);
             }
-        } else {
-            // If no status is set, use all order statuses plus our custom ones
-            $args['status'] = array_merge(array_keys(wc_get_order_statuses()), $custom_statuses);
+            
+            // Make sure we're not filtering out automation statuses
+            $args['status'] = array_values(array_unique($args['status']));
         }
         
-        // Remove duplicates
-        $args['status'] = array_unique($args['status']);
+        // CRITICAL: Also remove 'type' filter if it exists, as it might exclude our custom statuses
+        if (isset($args['type'])) {
+            unset($args['type']);
+        }
         
         // Debug logging
         error_log('Top Up Agent: My Account Query - Modified statuses: ' . print_r($args['status'], true));

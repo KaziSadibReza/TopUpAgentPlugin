@@ -52,6 +52,11 @@ if (empty($orders)) {
     echo '<tr><th>Order ID</th><th>Status</th><th>Customer Email</th><th>Customer ID</th><th>Date</th></tr>';
     
     foreach ($orders as $order) {
+        // Skip if it's a refund object
+        if ($order instanceof WC_Order_Refund) {
+            continue;
+        }
+        
         echo '<tr>';
         echo '<td>#' . $order->get_id() . '</td>';
         echo '<td>' . $order->get_status() . '</td>';
