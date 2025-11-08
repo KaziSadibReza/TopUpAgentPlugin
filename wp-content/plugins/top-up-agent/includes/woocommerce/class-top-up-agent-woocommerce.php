@@ -84,6 +84,9 @@ class Top_Up_Agent_WooCommerce_Integration {
         // Hook into the core order query to modify it directly
         add_filter('woocommerce_order_data_store_cpt_get_orders_query', array($this, 'modify_orders_query_directly'), 10, 2);
         
+        // Also hook into posts query for My Account page
+        add_action('pre_get_posts', array($this, 'modify_my_account_orders_query'), 10, 1);
+        
         // Add automation completion indicator and auto-complete orders
         add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
         add_action('woocommerce_order_status_changed', array($this, 'auto_complete_automation_orders'), 10, 4);
@@ -2828,6 +2831,34 @@ jQuery(document).ready(function($) {
         }
         
         return $query;
+    }
+
+
+    /**
+     * Modify the pre_get_posts query for My Account orders
+     * This ensures automation statuses are included in the posts query
+     * 
+     * @param WP_Query $query
+     */
+    public function modify_my_account_orders_query($query) {
+        // Only modify My Account order queries
+        if (!is_admin() && $query->is_main_query() && is_account_page() && isset($query->query_vars['post_type']) && $query->query_vars['post_type'] === 'shop_order') {
+            error_log('Top Up Agent: Modifying My Account posts query');
+            
+            $post_status = $query->get('post_status');
+            
+            // Add our custom statuses
+            $custom_statuses = array('automation-failed', 'automation-pending', 'automation-processing', 'automation-completed');
+            
+            if (is_array($post_status)) {
+                $post_status = array_merge($post_status, $custom_statuses);
+            } else {
+                $post_status = $custom_statuses;
+            }
+            
+            $query->set('post_status', array_unique($post_status));
+            error_log('Top Up Agent: Modified post_status to: ' . print_r($post_status, true));
+        }
     }
 
 }
