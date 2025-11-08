@@ -1151,7 +1151,7 @@ class Top_Up_Agent_WooCommerce_Integration {
         
         $license_key = get_post_meta($order->get_id(), '_automation_license_key', true);
         if ($license_key) {
-            echo '<p><strong>License:</strong> ' . substr($license_key, 0, 15) . '...</p>';
+            echo '<p><strong>License:</strong> ' . esc_html($license_key) . '</p>';
         }
         
         $player_id = get_post_meta($order->get_id(), '_automation_player_id', true);
