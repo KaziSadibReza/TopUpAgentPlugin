@@ -70,6 +70,10 @@ class Top_Up_Agent_WooCommerce_Integration {
         add_action('woocommerce_admin_order_data_after_order_details', array($this, 'add_automation_order_details'));
         add_action('add_meta_boxes', array($this, 'add_automation_admin_controls'));
         
+        // Add automation status display for customers (front-end)
+        add_action('woocommerce_order_details_after_order_table', array($this, 'display_customer_automation_status'), 10, 1);
+        add_action('woocommerce_thankyou', array($this, 'display_customer_automation_status_thankyou'), 10, 1);
+        
         // Add automation completion indicator and auto-complete orders
         add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
         add_action('woocommerce_order_status_changed', array($this, 'auto_complete_automation_orders'), 10, 4);
@@ -2555,4 +2559,150 @@ jQuery(document).ready(function($) {
             error_log("Top Up Agent: Order #{$order_id} automatically completed after automation success");
         }
     }
+    /**
+     * Display automation status on customer order details page
+     * 
+     * @param WC_Order $order
+     */
+    public function display_customer_automation_status($order) {
+        if (!$order) {
+            return;
+        }
+
+        $order_id = $order->get_id();
+        $order_status = $order->get_status();
+        
+        // Only show for automation-related statuses
+        if (!in_array($order_status, ['automation-pending', 'automation-processing', 'automation-failed', 'automation-completed', 'processing', 'completed'])) {
+            return;
+        }
+
+        // Get automation data
+        $queue_id = get_post_meta($order_id, '_automation_queue_id', true);
+        $queue_ids = get_post_meta($order_id, '_automation_queue_ids', true);
+        $automation_completed_at = get_post_meta($order_id, '_automation_completed_at', true);
+        $automation_error = get_post_meta($order_id, '_automation_error', true);
+        $automation_result = get_post_meta($order_id, '_automation_result', true);
+        
+        // Determine status
+        $status_text = '';
+        $status_color = '';
+        $status_icon = '';
+        $show_whatsapp = false;
+        
+        switch ($order_status) {
+            case 'automation-pending':
+                $status_text = 'Pending - Waiting to start';
+                $status_color = '#f0ad4e';
+                $status_icon = '⏳';
+                break;
+            case 'automation-processing':
+            case 'processing':
+                $status_text = 'Processing - Your order is being processed';
+                $status_color = '#0073aa';
+                $status_icon = '⚙️';
+                break;
+            case 'automation-failed':
+                $status_text = 'Failed - There was an issue processing your order';
+                $status_color = '#dc3232';
+                $status_icon = '❌';
+                $show_whatsapp = true;
+                break;
+            case 'automation-completed':
+            case 'completed':
+                if ($automation_completed_at) {
+                    $status_text = 'Completed Successfully';
+                    $status_color = '#46b450';
+                    $status_icon = '✅';
+                }
+                break;
+        }
+
+        if (!$status_text) {
+            return;
+        }
+        
+        ?>
+<section class="woocommerce-order-automation-status"
+    style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 5px; border-left: 4px solid <?php echo esc_attr($status_color); ?>;">
+    <h2 style="margin-top: 0; font-size: 18px; color: #333;">
+        <?php echo esc_html($status_icon); ?> Order Processing Status
+    </h2>
+
+    <div style="margin-bottom: 15px;">
+        <span
+            style="display: inline-block; padding: 8px 15px; background: <?php echo esc_attr($status_color); ?>; color: white; border-radius: 4px; font-weight: 600;">
+            <?php echo esc_html($status_text); ?>
+        </span>
+    </div>
+
+    <?php if ($order_status === 'automation-failed' && $automation_error): ?>
+    <div style="padding: 12px; background: white; border-radius: 4px; margin-bottom: 15px; border: 1px solid #ddd;">
+        <strong style="color: #dc3232;">Error Details:</strong>
+        <p style="margin: 8px 0 0 0; color: #666;"><?php echo esc_html($automation_error); ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($automation_completed_at): ?>
+    <div style="color: #666; font-size: 14px; margin-top: 10px;">
+        <strong>Completed at:</strong>
+        <?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($automation_completed_at))); ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($queue_id || $queue_ids): ?>
+    <div style="color: #999; font-size: 12px; margin-top: 10px;">
+        Queue ID: <?php echo esc_html($queue_id ?: implode(', ', (array)$queue_ids)); ?>
+    </div>
+    <?php endif; ?>
+
+    <?php 
+            // Show WhatsApp support button if automation failed
+            if ($show_whatsapp) {
+                $support_whatsapp = get_option('top_up_agent_support_whatsapp', '');
+                if (!empty($support_whatsapp)) {
+                    $order_number = $order->get_order_number();
+                    $customer_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+                    
+                    $whatsapp_message = "Hello, I need help with my order.\n\n";
+                    $whatsapp_message .= "Order Number: #" . $order_number . "\n";
+                    $whatsapp_message .= "Customer: " . $customer_name . "\n";
+                    $whatsapp_message .= "Issue: " . ($automation_error ?: 'Order processing failed') . "\n\n";
+                    $whatsapp_message .= "Please help me resolve this issue.";
+                    
+                    $whatsapp_url = 'https://wa.me/' . preg_replace('/[^0-9]/', '', $support_whatsapp) . '?text=' . urlencode($whatsapp_message);
+                    ?>
+    <div style="margin-top: 15px;">
+        <a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank"
+            style="display: inline-block; padding: 12px 24px; background: #25D366; color: white; text-decoration: none; border-radius: 5px; font-weight: 600; transition: background 0.3s;">
+            💬 Contact Support on WhatsApp
+        </a>
+    </div>
+    <?php 
+                }
+            }
+            ?>
+</section>
+<?php
+    }
+
+    /**
+     * Display automation status on thank you page
+     * 
+     * @param int $order_id
+     */
+    public function display_customer_automation_status_thankyou($order_id) {
+        if (!$order_id) {
+            return;
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+
+        // Display the same status box
+        $this->display_customer_automation_status($order);
+    }
+
 }

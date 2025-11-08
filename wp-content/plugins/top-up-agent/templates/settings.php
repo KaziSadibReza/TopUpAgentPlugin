@@ -6,6 +6,7 @@ if (isset($_POST['top_up_agent_settings_submit']) && check_admin_referer('top_up
     update_option('top_up_agent_api_key', sanitize_text_field($_POST['top_up_agent_api_key']));
     update_option('top_up_agent_auto_run_on_processing', isset($_POST['top_up_agent_auto_run_on_processing']));
     update_option('top_up_agent_player_id_meta_key', sanitize_text_field($_POST['top_up_agent_player_id_meta_key']));
+    update_option('top_up_agent_support_whatsapp', sanitize_text_field($_POST['top_up_agent_support_whatsapp']));
     
     $message = '<div class="updated"><p>Settings saved successfully.</p></div>';
 }
@@ -14,6 +15,7 @@ $server_url = esc_attr(get_option('top_up_agent_server_url', 'https://server.uid
 $api_key = esc_attr(get_option('top_up_agent_api_key', ''));
 $auto_run_on_processing = get_option('top_up_agent_auto_run_on_processing', false);
 $player_id_meta_key = esc_attr(get_option('top_up_agent_player_id_meta_key', 'player_id'));
+$support_whatsapp = esc_attr(get_option('top_up_agent_support_whatsapp', ''));
 
 // Get server status
 require_once plugin_dir_path(__FILE__) . '../includes/api-integration/class-api-client.php';
@@ -81,6 +83,15 @@ if (class_exists('WooCommerce')) {
                             <?php checked($auto_run_on_processing); ?>>
                         Automatically run automation when orders change to "Processing" status
                     </label>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="top_up_agent_support_whatsapp">Customer Support WhatsApp Number</label></th>
+                <td>
+                    <input type="text" id="top_up_agent_support_whatsapp" name="top_up_agent_support_whatsapp"
+                        value="<?php echo $support_whatsapp; ?>" class="regular-text" 
+                        placeholder="+8801234567890">
+                    <p class="description">Enter WhatsApp number with country code (e.g., +8801234567890). A "Message Support" button will appear for customers when automation fails.</p>
                 </td>
             </tr>
             <tr>

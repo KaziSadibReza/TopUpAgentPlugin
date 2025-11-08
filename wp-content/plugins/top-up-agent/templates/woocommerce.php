@@ -441,6 +441,31 @@ if (isset($_POST['action']) && $_POST['action'] === 'retry_automation' && wp_ver
                             👁️ View Order
                         </a>
 
+                        <!-- WhatsApp Support Button (if automation failed and WhatsApp number is set) -->
+                        <?php 
+                        $support_whatsapp = get_option('top_up_agent_support_whatsapp', '');
+                        if (!empty($support_whatsapp) && $automation && $automation['status'] === 'failed'): 
+                            // Prepare WhatsApp message
+                            $order_number = $order->get_order_number();
+                            $customer_name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+                            $error_message = !empty($queue_items) ? ($queue_items[0]['error_message'] ?? 'Unknown error') : 'Automation failed';
+                            
+                            $whatsapp_message = "Hello, I need help with my order.\n\n";
+                            $whatsapp_message .= "Order Number: #" . $order_number . "\n";
+                            $whatsapp_message .= "Customer: " . $customer_name . "\n";
+                            $whatsapp_message .= "Issue: Automation failed - " . substr($error_message, 0, 100) . "\n\n";
+                            $whatsapp_message .= "Please help me resolve this issue.";
+                            
+                            $whatsapp_url = 'https://wa.me/' . preg_replace('/[^0-9]/', '', $support_whatsapp) . '?text=' . urlencode($whatsapp_message);
+                        ?>
+                        <a href="<?php echo esc_url($whatsapp_url); ?>" 
+                            target="_blank"
+                            class="button button-small"
+                            style="background: #25D366; color: white; border-color: #25D366;">
+                            💬 Message Support
+                        </a>
+                        <?php endif; ?>
+
                         <!-- Retry Automation (if failed or no automation) -->
                         <?php if (!$automation || in_array($automation['status'], ['failed', 'pending'])): ?>
                         <form method="POST" style="margin: 0;">
