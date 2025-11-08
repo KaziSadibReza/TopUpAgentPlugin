@@ -918,14 +918,12 @@ class Top_Up_Agent_WebSocket_Integration {
         // Order Items
         $html .= '<h3>Order Items</h3>';
         $html .= '<table class="wp-list-table widefat">';
-        $html .= '<thead><tr><th>Product</th><th>Quantity</th><th>Price</th><th>Total</th></tr></thead>';
+        $html .= '<thead><tr><th>Product</th><th>Price</th></tr></thead>';
         $html .= '<tbody>';
         
         foreach ($order->get_items() as $item) {
             $html .= '<tr>';
             $html .= '<td>' . $item->get_name() . '</td>';
-            $html .= '<td>' . $item->get_quantity() . '</td>';
-            $html .= '<td>$' . number_format($item['line_total'] / $item->get_quantity(), 2) . '</td>';
             $html .= '<td>$' . number_format($item['line_total'], 2) . '</td>';
             $html .= '</tr>';
         }

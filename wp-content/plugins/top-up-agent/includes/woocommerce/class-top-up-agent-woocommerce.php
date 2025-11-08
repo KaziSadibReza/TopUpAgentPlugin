@@ -34,6 +34,12 @@ class Top_Up_Agent_WooCommerce_Integration {
     }
     
     private function init_hooks() {
+        // Cart restrictions - single product, quantity 1 only
+        add_filter('woocommerce_add_to_cart_validation', array($this, 'restrict_cart_to_single_product'), 10, 3);
+        add_filter('woocommerce_quantity_input_args', array($this, 'force_quantity_one'), 10, 2);
+        add_filter('woocommerce_cart_item_quantity', array($this, 'disable_quantity_input'), 10, 3);
+        add_action('woocommerce_before_cart', array($this, 'show_cart_restriction_notice'));
+        
         // Hook into order status changes - ONLY processing status triggers automation
         add_action('woocommerce_order_status_processing', array($this, 'handle_processing_order'), 10, 1);
         
@@ -103,6 +109,44 @@ class Top_Up_Agent_WooCommerce_Integration {
         add_action('wp', array($this, 'schedule_status_checks'));
         add_filter('cron_schedules', array($this, 'add_cron_intervals'));
         add_action('top_up_agent_check_automation_status', array($this, 'check_automation_status_updates'));
+    }
+    
+    /**
+     * Restrict cart to single product only
+     */
+    public function restrict_cart_to_single_product($valid, $product_id, $quantity) {
+        // Check if cart already has items
+        if (!WC()->cart->is_empty()) {
+            wc_add_notice(__('You can only purchase one product at a time. Please complete your current order or empty your cart first.', 'top-up-agent'), 'error');
+            return false;
+        }
+        
+        return $valid;
+    }
+    
+    /**
+     * Force quantity to always be 1
+     */
+    public function force_quantity_one($args, $product) {
+        $args['input_value'] = 1;
+        $args['max_value'] = 1;
+        $args['min_value'] = 1;
+        $args['step'] = 1;
+        return $args;
+    }
+    
+    /**
+     * Disable quantity input field - display as text
+     */
+    public function disable_quantity_input($product_quantity, $cart_item_key, $cart_item) {
+        return '1'; // Just show "1" as plain text
+    }
+    
+    /**
+     * Show notice about cart restrictions
+     */
+    public function show_cart_restriction_notice() {
+        wc_print_notice(__('Note: You can only purchase one product with quantity 1 per order.', 'top-up-agent'), 'notice');
     }
     
     /**
@@ -481,26 +525,19 @@ class Top_Up_Agent_WooCommerce_Integration {
                 continue;
             }
             
-            $quantity = $item->get_quantity();
-            error_log("Top Up Agent: Product $check_id has quantity: $quantity");
+            // Get available license key for this product (quantity is always 1)
+            $license_data = $this->get_license_for_product($check_id);
             
-            // Handle multiple quantities - create separate automation for each quantity
-            for ($i = 1; $i <= $quantity; $i++) {
-                // Get available license keys for this product instance
-                $license_data = $this->get_license_for_product($check_id);
-                
-                if ($license_data) {
-                    $automation_items[] = [
-                        'product_id' => $check_id,
-                        'product_name' => $item->get_name() . " (Item $i of $quantity)",
-                        'quantity' => 1, // Each automation handles 1 item
-                        'license_data' => $license_data
-                    ];
-                    error_log("Top Up Agent: Created automation item $i of $quantity for product $check_id");
-                } else {
-                    error_log("Top Up Agent: No more license keys available for product $check_id at quantity $i of $quantity");
-                    break; // Stop if no more licenses available
-                }
+            if ($license_data) {
+                $automation_items[] = [
+                    'product_id' => $check_id,
+                    'product_name' => $item->get_name(),
+                    'quantity' => 1,
+                    'license_data' => $license_data
+                ];
+                error_log("Top Up Agent: Created automation item for product $check_id");
+            } else {
+                error_log("Top Up Agent: No license key available for product $check_id");
             }
         }
         

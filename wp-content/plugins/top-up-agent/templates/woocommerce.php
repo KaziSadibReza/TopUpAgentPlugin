@@ -428,7 +428,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'retry_automation' && wp_ver
                     <?php foreach ($order->get_items() as $item): ?>
                     <div style="margin-bottom: 5px;">
                         <strong><?php echo esc_html($item->get_name()); ?></strong>
-                        <br><small>Qty: <?php echo $item->get_quantity(); ?></small>
                     </div>
                     <?php endforeach; ?>
                 </td>
