@@ -76,6 +76,8 @@ class Top_Up_Agent_WooCommerce_Integration {
         
         // Make custom automation statuses visible in customer My Account orders
         add_filter('woocommerce_my_account_my_orders_query', array($this, 'add_custom_statuses_to_my_account'), 10, 1);
+        add_filter('woocommerce_order_is_paid_statuses', array($this, 'add_paid_statuses'), 10, 1);
+        add_filter('wc_order_is_editable', array($this, 'make_automation_orders_non_editable'), 10, 2);
         
         // Add automation completion indicator and auto-complete orders
         add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
@@ -2717,28 +2719,69 @@ jQuery(document).ready(function($) {
      * @return array
      */
     public function add_custom_statuses_to_my_account($args) {
-        // Get the default statuses WooCommerce shows to customers
-        $default_statuses = isset($args['status']) ? $args['status'] : array_keys(wc_get_order_statuses());
-        
-        // Add our custom automation statuses
+        // Add our custom automation statuses (with and without wc- prefix)
         $custom_statuses = array(
             'automation-pending',
             'automation-processing',
             'automation-failed',
-            'automation-completed'
+            'automation-completed',
+            'wc-automation-pending',
+            'wc-automation-processing',
+            'wc-automation-failed',
+            'wc-automation-completed'
         );
         
-        // Merge default and custom statuses
-        if (is_array($default_statuses)) {
-            $args['status'] = array_merge($default_statuses, $custom_statuses);
+        // Debug logging
+        error_log('Top Up Agent: My Account Query - Original args: ' . print_r($args, true));
+        
+        // If status is set in args, merge with it
+        if (isset($args['status'])) {
+            if (is_array($args['status'])) {
+                $args['status'] = array_merge($args['status'], $custom_statuses);
+            } else {
+                $args['status'] = array_merge(array($args['status']), $custom_statuses);
+            }
         } else {
-            $args['status'] = $custom_statuses;
+            // If no status is set, use all order statuses plus our custom ones
+            $args['status'] = array_merge(array_keys(wc_get_order_statuses()), $custom_statuses);
         }
         
         // Remove duplicates
         $args['status'] = array_unique($args['status']);
         
+        // Debug logging
+        error_log('Top Up Agent: My Account Query - Modified statuses: ' . print_r($args['status'], true));
+        
         return $args;
+    }
+    /**
+     * Add automation statuses to paid statuses list
+     * This helps WooCommerce recognize these orders as valid
+     * 
+     * @param array $statuses
+     * @return array
+     */
+    public function add_paid_statuses($statuses) {
+        $statuses[] = 'automation-pending';
+        $statuses[] = 'automation-processing';
+        $statuses[] = 'automation-failed';
+        $statuses[] = 'automation-completed';
+        return $statuses;
+    }
+
+    /**
+     * Make automation orders non-editable by customers
+     * 
+     * @param bool $editable
+     * @param WC_Order $order
+     * @return bool
+     */
+    public function make_automation_orders_non_editable($editable, $order) {
+        $status = $order->get_status();
+        if (in_array($status, ['automation-pending', 'automation-processing', 'automation-failed', 'automation-completed'])) {
+            return false;
+        }
+        return $editable;
     }
 
 }
