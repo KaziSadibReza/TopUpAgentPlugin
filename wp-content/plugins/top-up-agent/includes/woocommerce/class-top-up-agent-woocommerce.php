@@ -87,6 +87,9 @@ class Top_Up_Agent_WooCommerce_Integration {
         // Also hook into posts query for My Account page
         add_action('pre_get_posts', array($this, 'modify_my_account_orders_query'), 10, 1);
         
+        // Add filter to include automation statuses in valid order statuses for customer
+        add_filter('woocommerce_order_is_paid', array($this, 'mark_automation_orders_as_paid'), 10, 2);
+        
         // Add automation completion indicator and auto-complete orders
         add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
         add_action('woocommerce_order_status_changed', array($this, 'auto_complete_automation_orders'), 10, 4);
@@ -2727,42 +2730,18 @@ jQuery(document).ready(function($) {
      * @return array
      */
     public function add_custom_statuses_to_my_account($args) {
-        // Add our custom automation statuses (with and without wc- prefix)
-        $custom_statuses = array(
-            'automation-pending',
-            'automation-processing',
-            'automation-failed',
-            'automation-completed',
-            'wc-automation-pending',
-            'wc-automation-processing',
-            'wc-automation-failed',
-            'wc-automation-completed'
-        );
+        error_log('Top Up Agent: My Account Query Hook - Original args: ' . print_r($args, true));
         
-        // Debug logging
-        error_log('Top Up Agent: My Account Query - Original args: ' . print_r($args, true));
+        // CRITICAL FIX: Remove status filter completely and use 'any' to get ALL orders
+        // The status filter is preventing orders with custom statuses from showing
+        $args['status'] = 'any';
         
-        // IMPORTANT: Remove the status filter entirely and let WooCommerce find all orders for this customer
-        // Then we'll filter by checking the actual order status
-        if (isset($args['status'])) {
-            // Keep existing statuses but add ours
-            if (is_array($args['status'])) {
-                $args['status'] = array_merge($args['status'], $custom_statuses);
-            } else {
-                $args['status'] = array_merge(array($args['status']), $custom_statuses);
-            }
-            
-            // Make sure we're not filtering out automation statuses
-            $args['status'] = array_values(array_unique($args['status']));
-        }
-        
-        // CRITICAL: Also remove 'type' filter if it exists, as it might exclude our custom statuses
+        // Also ensure we don't have limiting filters
         if (isset($args['type'])) {
             unset($args['type']);
         }
         
-        // Debug logging
-        error_log('Top Up Agent: My Account Query - Modified statuses: ' . print_r($args['status'], true));
+        error_log('Top Up Agent: My Account Query Hook - Modified to use status=any');
         
         return $args;
     }
@@ -2859,6 +2838,24 @@ jQuery(document).ready(function($) {
             $query->set('post_status', array_unique($post_status));
             error_log('Top Up Agent: Modified post_status to: ' . print_r($post_status, true));
         }
+    }
+
+    /**
+     * Mark automation orders as paid so they show in customer account
+     * 
+     * @param bool $is_paid
+     * @param WC_Order $order
+     * @return bool
+     */
+    public function mark_automation_orders_as_paid($is_paid, $order) {
+        $status = $order->get_status();
+        $automation_statuses = array('automation-pending', 'automation-processing', 'automation-failed', 'automation-completed');
+        
+        if (in_array($status, $automation_statuses)) {
+            return true;
+        }
+        
+        return $is_paid;
     }
 
 }
