@@ -15,22 +15,29 @@ class Top_Up_Agent_Webhook_Handler {
      * Register the webhook REST API endpoint
      */
     public function register_webhook_endpoint() {
-        register_rest_route('top-up-agent/v1', '/webhook/automation-status', array(
+        error_log("Top Up Agent: Registering webhook endpoint at rest_api_init");
+        
+        $registered = register_rest_route('top-up-agent/v1', '/webhook/automation-status', array(
             'methods' => 'POST',
             'callback' => array($this, 'handle_automation_status_webhook'),
             'permission_callback' => array($this, 'verify_webhook_permission'),
             'args' => array(
                 'queueId' => array(
-                    'required' => true,
+                    'required' => false, // Changed to false to allow debugging
                     'type' => 'integer'
                 ),
                 'status' => array(
-                    'required' => true,
+                    'required' => false, // Changed to false to allow debugging
                     'type' => 'string',
                     'enum' => array('completed', 'failed')
                 )
             )
         ));
+        
+        error_log("Top Up Agent: Webhook endpoint registration result: " . ($registered ? 'SUCCESS' : 'FAILED'));
+        error_log("Top Up Agent: Webhook URL will be: " . rest_url('top-up-agent/v1/webhook/automation-status'));
+        error_log("Top Up Agent: Site URL: " . get_site_url());
+        error_log("Top Up Agent: Home URL: " . get_home_url());
     }
     
     /**

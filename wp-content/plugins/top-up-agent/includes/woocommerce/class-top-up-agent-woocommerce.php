@@ -38,6 +38,9 @@ class Top_Up_Agent_WooCommerce_Integration {
         add_filter('woocommerce_add_to_cart_validation', array($this, 'restrict_cart_to_single_product'), 10, 3);
         add_filter('woocommerce_quantity_input_args', array($this, 'force_quantity_one'), 10, 2);
         add_filter('woocommerce_cart_item_quantity', array($this, 'disable_quantity_input'), 10, 3);
+        add_filter('woocommerce_update_cart_validation', array($this, 'prevent_quantity_update'), 10, 4);
+        add_action('woocommerce_before_calculate_totals', array($this, 'enforce_quantity_one'), 10, 1);
+        add_action('woocommerce_add_to_cart', array($this, 'enforce_single_product_in_cart'), 10, 6);
         add_action('woocommerce_before_cart', array($this, 'show_cart_restriction_notice'));
         
         // Hook into order status changes - ONLY processing status triggers automation
@@ -117,8 +120,13 @@ class Top_Up_Agent_WooCommerce_Integration {
     public function restrict_cart_to_single_product($valid, $product_id, $quantity) {
         // Check if cart already has items
         if (!WC()->cart->is_empty()) {
-            wc_add_notice(__('You can only purchase one product at a time. Please complete your current order or empty your cart first.', 'top-up-agent'), 'error');
-            return false;
+            // Clear any existing items first
+            foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+                WC()->cart->remove_cart_item($cart_item_key);
+            }
+            
+            // Show notice about replacing the previous item
+            wc_add_notice(__('Previous product has been removed. You can only purchase one product at a time.', 'top-up-agent'), 'notice');
         }
         
         return $valid;
@@ -140,6 +148,52 @@ class Top_Up_Agent_WooCommerce_Integration {
      */
     public function disable_quantity_input($product_quantity, $cart_item_key, $cart_item) {
         return '1'; // Just show "1" as plain text
+    }
+    
+    /**
+     * Prevent quantity updates in cart
+     */
+    public function prevent_quantity_update($passed, $cart_item_key, $values, $quantity) {
+        // Force quantity to remain 1
+        if ($quantity != 1) {
+            wc_add_notice(__('Quantity cannot be changed. Each order is limited to 1 product with quantity 1.', 'top-up-agent'), 'error');
+            return false;
+        }
+        return $passed;
+    }
+    
+    /**
+     * Enforce quantity as 1 for all cart items
+     */
+    public function enforce_quantity_one($cart) {
+        if (is_admin() && !defined('DOING_AJAX')) {
+            return;
+        }
+        
+        foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
+            // Force quantity to 1 if it's not already
+            if ($cart_item['quantity'] != 1) {
+                $cart->set_quantity($cart_item_key, 1, false);
+            }
+        }
+    }
+    
+    /**
+     * Enforce single product in cart - remove old items when new one is added
+     */
+    public function enforce_single_product_in_cart($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data) {
+        // Get all cart items
+        $cart_items = WC()->cart->get_cart();
+        
+        // If more than one item in cart, keep only the newest one
+        if (count($cart_items) > 1) {
+            foreach ($cart_items as $key => $item) {
+                // Remove all items except the one just added
+                if ($key !== $cart_item_key) {
+                    WC()->cart->remove_cart_item($key);
+                }
+            }
+        }
     }
     
     /**
