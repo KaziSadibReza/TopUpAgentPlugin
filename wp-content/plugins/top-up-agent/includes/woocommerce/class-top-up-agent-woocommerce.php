@@ -744,6 +744,9 @@ class Top_Up_Agent_WooCommerce_Integration {
                 
                 $result = $this->api->add_to_queue($queue_data);
                 
+                // Debug: Log the API response
+                error_log("Top Up Agent DEBUG: API Response for order #$order_id: " . print_r($result, true));
+                
                 // Check for WP_Error first
                 if (is_wp_error($result)) {
                     $this->handle_automation_failure($order, 'API Error: ' . $result->get_error_message());
@@ -755,10 +758,30 @@ class Top_Up_Agent_WooCommerce_Integration {
                     // Mark license as used
                     $this->license_manager->mark_as_used($license_data['license_key'], $order_id);
                     
-                    // Store queue reference - only if we have a valid ID
-                    if (isset($result['data']['id']) && !empty($result['data']['id'])) {
-                        update_post_meta($order_id, '_automation_queue_id', $result['data']['id']);
+                    // Debug: Check what ID fields exist in the response
+                    error_log("Top Up Agent DEBUG: Looking for queue ID in response - Full result: " . print_r($result, true));
+                    
+                    // Try multiple possible response structures
+                    $queue_id = null;
+                    if (isset($result['data']['id'])) {
+                        $queue_id = $result['data']['id'];
+                        error_log("Top Up Agent DEBUG: Found queue ID in result['data']['id']: $queue_id");
+                    } elseif (isset($result['id'])) {
+                        $queue_id = $result['id'];
+                        error_log("Top Up Agent DEBUG: Found queue ID in result['id']: $queue_id");
+                    } elseif (isset($result['queueId'])) {
+                        $queue_id = $result['queueId'];
+                        error_log("Top Up Agent DEBUG: Found queue ID in result['queueId']: $queue_id");
+                    } else {
+                        error_log("Top Up Agent WARNING: No queue ID found in API response!");
                     }
+                    
+                    // Store queue reference if we found it
+                    if (!empty($queue_id)) {
+                        update_post_meta($order_id, '_automation_queue_id', $queue_id);
+                        error_log("Top Up Agent: Stored queue ID $queue_id for order #$order_id");
+                    }
+                    
                     update_post_meta($order_id, '_automation_type', 'single');
                     update_post_meta($order_id, '_automation_license_key', $license_data['license_key']);
                     
