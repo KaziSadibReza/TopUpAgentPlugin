@@ -79,6 +79,10 @@ class Top_Up_Agent_WooCommerce_Integration {
         add_filter('woocommerce_order_is_paid_statuses', array($this, 'add_paid_statuses'), 10, 1);
         add_filter('wc_order_is_editable', array($this, 'make_automation_orders_non_editable'), 10, 2);
         add_filter('woocommerce_valid_order_statuses_for_payment_complete', array($this, 'add_paid_statuses'), 10, 1);
+        add_filter('woocommerce_reports_order_statuses', array($this, 'add_paid_statuses'), 10, 1);
+        
+        // Hook into the core order query to modify it directly
+        add_filter('woocommerce_order_data_store_cpt_get_orders_query', array($this, 'modify_orders_query_directly'), 10, 2);
         
         // Add automation completion indicator and auto-complete orders
         add_action('woocommerce_admin_order_actions_end', array($this, 'add_automation_completion_indicator'));
@@ -2787,6 +2791,43 @@ jQuery(document).ready(function($) {
             return false;
         }
         return $editable;
+    }
+
+
+    /**
+     * Modify WooCommerce order query at the data store level
+     * This is a lower-level hook that should catch all order queries
+     * 
+     * @param array $query
+     * @param array $query_vars
+     * @return array
+     */
+    public function modify_orders_query_directly($query, $query_vars) {
+        // Only modify if this is a customer query (has customer parameter)
+        if (!empty($query_vars['customer'])) {
+            error_log('Top Up Agent: Data Store Query - Original query: ' . print_r($query, true));
+            
+            // If status is being filtered, make sure our custom statuses are included
+            if (isset($query['post_status'])) {
+                $custom_statuses = array(
+                    'wc-automation-pending',
+                    'wc-automation-processing',
+                    'wc-automation-failed',
+                    'wc-automation-completed'
+                );
+                
+                if (is_array($query['post_status'])) {
+                    $query['post_status'] = array_merge($query['post_status'], $custom_statuses);
+                } else {
+                    $query['post_status'] = array_merge(array($query['post_status']), $custom_statuses);
+                }
+                
+                $query['post_status'] = array_unique($query['post_status']);
+                error_log('Top Up Agent: Data Store Query - Modified post_status: ' . print_r($query['post_status'], true));
+            }
+        }
+        
+        return $query;
     }
 
 }
